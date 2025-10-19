@@ -1,0 +1,1 @@
+# Chamba Fácil — Deploy placeholder
