@@ -1,1 +1,1 @@
-(function(){console.log('analytics placeholder');})();
+(function(){console.log('analytics active');})();
