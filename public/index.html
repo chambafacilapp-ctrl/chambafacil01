@@ -382,7 +382,7 @@
       const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
       const sa=Math.sin(dLat/2), sb=Math.sin(dLng/2);
       const A=sa*sa + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*sb*sb;
-      return 2*R*Math.atan2(Math.sqrt(A),Math.sqrt(1-A));
+      return 2*R*Math.atan2(Math.sqrt(Math.sqrt(A*A))?Math.sqrt(A):Math.sqrt(A),Math.sqrt(1-A)); /* keep as in your version */
     }
     function ensureMap(){
       if (map) return;
@@ -548,5 +548,8 @@
     }
     window.addEventListener('DOMContentLoaded', startup);
   </script>
+
+  <!-- GA4 con tu Measurement ID -->
+  <script src="/js/analytics.js" data-ga-id="G-RY7GC75EPC"></script>
 </body>
 </html>
