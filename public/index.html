@@ -112,10 +112,17 @@
 
   <!-- Cloudinary (mostrar imágenes) -->
   <script>
-    const CLOUDINARY_CLOUD_NAME="demo"; // cambia por tu cloud_name
-    function cldImg(id,w=640){ return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto,w_${w}/${id}.jpg`; }
-    function cldSrcSet(id){ return [320,480,640,960,1200].map(w=>`${cldImg(id,w)} ${w}w`).join(','); }
-  </script>
+  const CLOUDINARY_CLOUD_NAME = "demo"; // tu cloud_name
+  function cldImg(id, w = 640){
+    const save = (navigator.connection && (navigator.connection.saveData || navigator.connection.effectiveType === '2g'));
+    const q = save ? 'q_50' : 'q_auto';
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,${q},w_${w}/${id}.jpg`;
+  }
+  function cldSrcSet(id){
+    const sizes = [320,480,640,960,1200];
+    return sizes.map(w => `${cldImg(id, w)} ${w}w`).join(',');
+  }
+</script>
 
   <style>
     .modal-backdrop{ position: fixed; inset: 0; background: rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index: 60; }
