@@ -12,9 +12,11 @@
     tailwind.config = { theme: { extend: { colors: { primary: {500:'#f97316',600:'#ea580c',700:'#c2410c'} } } } }
   </script>
 
+  <!-- Leaflet (mapa) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
   <script>
@@ -29,13 +31,15 @@
     let db=null; try{ if(FIREBASE_CONFIG.apiKey!=='YOUR_API_KEY'){ firebase.initializeApp(FIREBASE_CONFIG); db=firebase.firestore(); } }catch(e){}
   </script>
 
+  <!-- Cloudinary (mostrar imágenes) -->
   <script>
-    const CLOUDINARY_CLOUD_NAME="demo";
+    const CLOUDINARY_CLOUD_NAME="demo"; // cambia por tu cloud_name
     function cldImg(id,w=640){ return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto,w_${w}/${id}.jpg`; }
     function cldSrcSet(id){ return [320,480,640,960,1200].map(w=>`${cldImg(id,w)} ${w}w`).join(','); }
   </script>
 </head>
 <body class="antialiased text-slate-800">
+  <!-- Header -->
   <header class="fixed inset-x-0 top-0 z-50">
     <div class="mx-auto container px-4">
       <div class="mt-4 mb-3 flex items-center justify-between rounded-2xl bg-white/80 backdrop-blur px-4 py-3 shadow">
@@ -53,6 +57,7 @@
     </div>
   </header>
 
+  <!-- Hero -->
   <section id="inicio" class="pt-40">
     <div class="mx-auto container px-4 grid gap-8 md:grid-cols-2 items-center">
       <div>
@@ -67,30 +72,40 @@
     </div>
   </section>
 
+  <!-- Valor (bullets clickeables) -->
   <section id="valor" class="py-12">
     <div class="mx-auto container px-4 text-center">
       <h2 class="text-3xl font-bold text-gray-800 mb-2">¿Por qué elegir <span class="text-primary-600">Chamba Fácil</span>?</h2>
       <p class="text-lg text-gray-600 mb-8">Conecta con más clientes locales y crece tu trabajo en minutos.</p>
       <div class="grid md:grid-cols-3 gap-6 text-gray-700">
-        <div class="p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition">
+        <!-- Mapa cerca de mí → ir al mapa y solicitar geolocalización -->
+        <button type="button" onclick="goTo('map')"
+          class="p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition border text-left w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-600">
           <div class="text-4xl">📍</div>
           <h3 class="font-semibold text-xl mt-2">Mapa cerca de mí</h3>
           <p class="text-slate-600">Encuentra y ofrece servicios con ubicación real, visibles en tu zona.</p>
-        </div>
-        <div class="p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition">
+        </button>
+
+        <!-- Publica en 2 minutos → ir a pagos -->
+        <button type="button" onclick="goTo('pagos')"
+          class="p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition border text-left w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-600">
           <div class="text-4xl">⚡</div>
           <h3 class="font-semibold text-xl mt-2">Publica en 2 minutos</h3>
           <p class="text-slate-600">Crea tu perfil rápido, sube fotos y empieza a recibir clientes hoy.</p>
-        </div>
-        <div class="p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition">
+        </button>
+
+        <!-- + Clientes locales → ir a categorías -->
+        <button type="button" onclick="goTo('categorias')"
+          class="p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition border text-left w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-600">
           <div class="text-4xl">🤝</div>
           <h3 class="font-semibold text-xl mt-2">+ Clientes locales</h3>
           <p class="text-slate-600">Personas cercanas te encuentran fácil y te contactan por WhatsApp.</p>
-        </div>
+        </button>
       </div>
     </div>
   </section>
 
+  <!-- Testimonios -->
   <section id="testimonios" class="bg-slate-50 py-12">
     <div class="mx-auto container px-4 text-center">
       <h2 class="text-3xl font-bold text-gray-800 mb-6">Lo que dicen nuestros usuarios</h2>
@@ -111,6 +126,7 @@
     </div>
   </section>
 
+  <!-- Logos de pago -->
   <section id="pagos-logos" class="py-12">
     <div class="mx-auto container px-4 text-center">
       <h2 class="text-2xl font-bold text-gray-800 mb-4">Métodos de pago seguros</h2>
@@ -123,6 +139,7 @@
     </div>
   </section>
 
+  <!-- Categorías -->
   <section id="categorias" class="py-10 bg-white">
     <div class="mx-auto container px-4">
       <h2 class="text-3xl font-bold text-center">Oficios por especialidad</h2>
@@ -131,6 +148,7 @@
     </div>
   </section>
 
+  <!-- Oficios + mapa -->
   <section id="oficios" class="py-16 bg-slate-50">
     <div class="mx-auto container px-4">
       <h2 class="text-3xl font-bold text-center">Oficios</h2>
@@ -156,6 +174,7 @@
     </div>
   </section>
 
+  <!-- Plan único -->
   <section id="precios" class="py-16">
     <div class="mx-auto container px-4">
       <h2 class="text-3xl font-bold text-center">Plan</h2>
@@ -170,12 +189,14 @@
     </div>
   </section>
 
+  <!-- Pagos -->
   <section id="pagos" class="py-16 bg-slate-50">
     <div class="mx-auto container px-4">
       <h2 class="text-3xl font-bold text-center">Portal de pagos</h2>
       <p class="mt-2 text-center text-slate-600">Transferencia (SPEI) y OXXO por Mercado Pago.</p>
 
       <div class="mt-8 grid gap-6 md:grid-cols-2">
+        <!-- SPEI -->
         <div class="rounded-2xl border p-6 bg-white">
           <h3 class="text-xl font-semibold">Transferencia (SPEI)</h3>
           <p class="mt-2 text-sm text-slate-600">Realiza transferencia y envía tu comprobante.</p>
@@ -197,6 +218,7 @@
           </form>
         </div>
 
+        <!-- OXXO / MP (plan único) -->
         <div class="rounded-2xl border p-6 bg-white">
           <h3 class="text-xl font-semibold">Pago en OXXO</h3>
           <p class="mt-2 text-sm text-slate-600">Se generará una referencia por Mercado Pago.</p>
@@ -219,21 +241,27 @@
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 
+  <!-- Mercado Pago SDK -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
   <script>
+    // Reemplaza por tu Public Key de Mercado Pago
     const mp = new MercadoPago('PUBLIC_KEY_PLACEHOLDER', { locale: 'es-MX' });
     async function pagar(plan){
       const res = await fetch('/api/create-preference', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ plan })});
       const data = await res.json();
       if (data?.init_point || data?.sandbox_init_point) {
         location.href = data.init_point || data.sandbox_init_point;
-      } else { alert('No se pudo crear la orden'); }
+      } else {
+        alert('No se pudo crear la orden');
+      }
     }
   </script>
 
+  <!-- App logic: categorías, mapa, filtro, ver en mapa -->
   <script>
     const CATEGORIES = ["Albañilería","Jardinería","Plomería","Electricidad","Mecánicos","Estilistas","Cerrajeros","Zapateros"];
     let activeCategory = null;
+
     function renderCategories(){
       const grid = document.getElementById('cat-grid');
       grid.innerHTML = CATEGORIES.map(cat => `
@@ -245,11 +273,18 @@
         </article>
       `).join('');
     }
-    function entrarCategoria(cat){ activeCategory = cat; applyFilterByCategory(); }
+    function entrarCategoria(cat){
+      activeCategory = cat;
+      applyFilterByCategory();
+      const oficios = document.getElementById('oficios');
+      if (oficios) oficios.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
   </script>
 
   <script>
-    let userLoc = null; let map, userMarker, markersLayer;
+    // ====== Geocerca con Leaflet ======
+    let userLoc = null;   // {lat,lng}
+    let map, userMarker, markersLayer;
     const PAGE_SIZE = 12; let page=1; let lastItems=[];
 
     function distKm(a,b){ const toRad=d=>d*Math.PI/180, R=6371;
@@ -258,7 +293,8 @@
       const A=sa*sa + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*sb*sb;
       return 2*R*Math.atan2(Math.sqrt(A),Math.sqrt(1-A));
     }
-    function ensureMap(){ if (map) return;
+    function ensureMap(){
+      if (map) return;
       map = L.map('map').setView([19.7008, -101.1844], 12);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap'}).addTo(map);
       markersLayer = L.layerGroup().addTo(map);
@@ -288,6 +324,7 @@
         const snap = await db.collection('profiles').orderBy('createdAt','desc').limit(limit).get();
         return snap.docs.map(d=>d.data());
       }
+      // Fallback
       return Array.from({length:24}).map((_,i)=>({name:`Oficio ${i+1}`, oficio:'Varios', ciudad:'', photos:['sample'], rating:4.5}));
     }
     async function fetchProfilesByCategory(cat, limit=200){
@@ -323,7 +360,8 @@
     function verEnMapa(i){
       const p = lastItems[i];
       if (!p || !p.location || typeof p.location.lat!=='number' || typeof p.location.lng!=='number'){
-        alert('Este perfil aún no tiene ubicación registrada.'); return;
+        alert('Este perfil aún no tiene ubicación registrada.');
+        return;
       }
       ensureMap();
       const latlng = [p.location.lat, p.location.lng];
@@ -364,12 +402,33 @@
       updateMap(userLoc, filtered.slice(0,50));
     }
 
+    // Botones de filtro manual
     document.getElementById('btn-geo').onclick = async () => {
       try{ userLoc = await getGeolocation(); ensureMap(); map.setView([userLoc.lat,userLoc.lng], 13); }
       catch(e){ alert('Activa tu ubicación y vuelve a intentar.'); }
       if (activeCategory) applyFilterByCategory(); else applyNearMe();
     };
     document.getElementById('btn-apply').onclick = () => { if (activeCategory) applyFilterByCategory(); else applyNearMe(); };
+
+    // Scroll helper + autogeolocalización cuando se pide ir al mapa
+    function goTo(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (id === 'map') {
+        // Asegura mapa y solicita geolocalización automáticamente
+        ensureMap();
+        setTimeout(async () => {
+          try {
+            userLoc = await getGeolocation();
+            map.setView([userLoc.lat, userLoc.lng], 13);
+            if (activeCategory) applyFilterByCategory(); else applyNearMe();
+          } catch (e) {
+            // Usuario negó permisos o no disponible: no rompemos nada
+          }
+        }, 350);
+      }
+    }
 
     function ensureStartup(){
       renderCategories();
