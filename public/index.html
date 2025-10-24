@@ -565,12 +565,31 @@
       }
     }
 
-    async function startup(){
-      allProfilesCache = await fetchProfiles(500);
-      const counts = computeCounts(allProfilesCache);
-      renderCategories(counts);
+    <script>
+  async function startup(){
+    allProfilesCache = await fetchProfiles(500);
+    const counts = computeCounts(allProfilesCache);
+    renderCategories(counts);
+
+    // Defer del mapa: solo al ver la sección #oficios
+    const target = document.getElementById('oficios');
+    if ('IntersectionObserver' in window && target){
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)){
+          ensureMap();
+          applyNearMe();
+          io.disconnect();
+        }
+      }, { rootMargin: '200px 0px' });
+      io.observe(target);
+    } else {
+      // Fallback
       ensureMap();
       applyNearMe();
+    }
+  }
+  window.addEventListener('DOMContentLoaded', startup);
+</script>
     }
     window.addEventListener('DOMContentLoaded', startup);
   </script>
