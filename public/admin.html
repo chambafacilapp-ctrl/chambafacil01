@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Panel admin — Chamba Fácil</title>
+  <meta name="description" content="Panel de administración para registrar perfiles en Chamba Fácil. Incluye control de pago, fotos y ubicación.">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RY7GC75EPC"></script>
@@ -13,9 +14,79 @@
     gtag('js', new Date());
     gtag('config', 'G-RY7GC75EPC');
   </script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#f97316',600:'#ea580c',700:'#c2410c'}}}}}</script>
+
+  <!-- Firebase (defer) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 </head>
-<body>
-  <h1>Panel admin</h1>
-  <p>Creación de perfiles y control.</p>
+
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <header class="bg-white border-b sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 font-semibold">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white">CF</span>
+        Chamba Fácil
+      </a>
+      <a href="/#pagos" class="rounded-xl border px-4 py-2 text-sm hover:bg-slate-50">Salir</a>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-10">
+    <div class="bg-white rounded-2xl border shadow p-6 md:p-8">
+      <h1 class="text-3xl font-extrabold">Registro de perfil</h1>
+      <p class="mt-2 text-slate-600 text-sm">Completa todos los campos. Tu perfil aparecerá en el mapa después de validar el pago anual.</p>
+
+      <form id="profileForm" class="mt-6 grid gap-4">
+        <input type="text" name="nombre" placeholder="Nombre completo" required class="rounded-xl border px-3 py-2">
+        <select name="oficio" required class="rounded-xl border px-3 py-2">
+          <option value="">Selecciona tu oficio</option>
+          <option>Albañilería</option>
+          <option>Jardinería</option>
+          <option>Plomería</option>
+          <option>Electricidad</option>
+          <option>Mecánicos</option>
+          <option>Estilistas</option>
+          <option>Cerrajeros</option>
+          <option>Zapateros</option>
+        </select>
+        <input type="text" name="ciudad" placeholder="Ciudad o colonia" required class="rounded-xl border px-3 py-2">
+        <textarea name="descripcion" rows="3" placeholder="Descripción breve de tus servicios" class="rounded-xl border px-3 py-2"></textarea>
+        <input type="tel" name="telefono" placeholder="Teléfono (WhatsApp)" required class="rounded-xl border px-3 py-2">
+        <label class="block">Sube hasta 3 fotos de tus trabajos:
+          <input type="file" name="fotos" accept="image/*" multiple class="mt-1 block w-full text-sm text-slate-600">
+        </label>
+        <label class="block mt-3">
+          <span>Ubicación:</span>
+          <div id="map" class="mt-2 h-60 w-full rounded-2xl border"></div>
+        </label>
+        <button type="submit" class="mt-4 rounded-xl bg-primary-600 px-4 py-2 text-white hover:bg-primary-700">Enviar perfil</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const FIREBASE_CONFIG={
+      apiKey:"YOUR_API_KEY",
+      authDomain:"YOUR_PROJECT.firebaseapp.com",
+      projectId:"YOUR_PROJECT_ID",
+      storageBucket:"YOUR_PROJECT.appspot.com",
+      messagingSenderId:"SENDER_ID",
+      appId:"APP_ID"
+    };
+    let db=null;
+    document.addEventListener('DOMContentLoaded', () => {
+      try{
+        if(FIREBASE_CONFIG.apiKey!=='YOUR_API_KEY' && window.firebase){
+          if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+          db=firebase.firestore();
+        }
+      }catch(e){ console.warn('Firebase no inicializado:', e); }
+    });
+  </script>
 </body>
 </html>
