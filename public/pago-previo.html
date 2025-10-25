@@ -1,9 +1,15 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pago previo — Chamba Fácil</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chamba Fácil — Antes de crear tu perfil</title>
+  <meta name="description" content="Completa tu pago anual de $150 MXN para activar tu perfil en Chamba Fácil y aparecer en el mapa cerca de mí." />
+  <meta name="theme-color" content="#f97316" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+  <link rel="manifest" href="/manifest.webmanifest">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RY7GC75EPC"></script>
@@ -13,9 +19,90 @@
     gtag('js', new Date());
     gtag('config', 'G-RY7GC75EPC');
   </script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#f97316',600:'#ea580c',700:'#c2410c'}}}}}</script>
 </head>
-<body>
-  <h1>Pago previo</h1>
-  <p>Confirma tu pago para continuar.</p>
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 font-semibold">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white">CF</span>
+        Chamba Fácil
+      </a>
+      <nav class="hidden md:flex gap-6 text-sm">
+        <a href="/#categorias" class="hover:text-primary-600">Categorías</a>
+        <a href="/#oficios" class="hover:text-primary-600">Oficios</a>
+        <a href="/#pagos" class="hover:text-primary-600">Pagos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-10">
+    <div class="bg-white rounded-2xl border shadow p-6 md:p-8">
+      <h1 class="text-3xl font-extrabold">Antes de crear tu perfil</h1>
+      <p class="mt-3 text-slate-600">
+        Para activar tu perfil y aparecer en el mapa “cerca de mí”, es necesario cubrir la <strong>inscripción anual de $150 MXN</strong>.
+      </p>
+
+      <section class="mt-6 grid md:grid-cols-2 gap-4">
+        <div class="rounded-xl border p-4">
+          <h2 class="font-semibold">Beneficios</h2>
+          <ul class="mt-2 list-disc pl-5 text-slate-700 space-y-1">
+            <li>Apareces por <strong>especialidad</strong> y en el <strong>mapa cercano</strong>.</li>
+            <li>Recibes clientes por <strong>WhatsApp</strong>.</li>
+            <li>Puedes subir fotos de tus trabajos (hasta 3).</li>
+          </ul>
+        </div>
+        <div class="rounded-xl border p-4">
+          <h2 class="font-semibold">Métodos de pago</h2>
+          <ul class="mt-2 list-disc pl-5 text-slate-700 space-y-1">
+            <li><strong>Transferencia SPEI</strong> (Banorte)</li>
+            <li><strong>OXXO</strong> por Mercado Pago</li>
+          </ul>
+          <p class="mt-2 text-sm text-slate-500">
+            Puedes hacer tu pago desde la sección <em>Pagos</em> del sitio.
+          </p>
+        </div>
+      </section>
+
+      <div class="mt-6 grid md:grid-cols-2 gap-3">
+        <a href="/#pagos" class="text-center rounded-xl border px-4 py-3 hover:bg-slate-50">
+          Ir a Pagos
+        </a>
+
+        <button id="btn-continue" class="rounded-xl bg-primary-600 px-4 py-3 text-white disabled:opacity-50" disabled>
+          Ya pagué, continuar &rarr;
+        </button>
+      </div>
+
+      <label class="mt-4 flex items-start gap-3 text-sm">
+        <input id="chk-paid" type="checkbox" class="mt-0.5 rounded border">
+        <span>
+          Confirmo que ya realicé el pago anual de <strong>$150 MXN</strong> y tengo mi comprobante
+          (puedo adjuntarlo en el formulario).
+        </span>
+      </label>
+
+      <p class="mt-4 text-xs text-slate-500">
+        Nota: Si aún no pagas, primero da clic en <strong>Ir a Pagos</strong>. Después podrás volver aquí.
+      </p>
+    </div>
+
+    <div class="mt-6 text-right">
+      <a href="/" class="text-sm rounded-lg border px-3 py-2 hover:bg-white">← Volver al inicio</a>
+    </div>
+  </main>
+
+  <script>
+    const chk = document.getElementById('chk-paid');
+    const btn = document.getElementById('btn-continue');
+    chk.addEventListener('change', () => { btn.disabled = !chk.checked; });
+    btn.addEventListener('click', () => {
+      try { window.gtag && gtag('event', 'continue_to_admin_after_payment'); } catch(e) {}
+      location.href = '/admin.html';
+    });
+  </script>
 </body>
 </html>
