@@ -1,9 +1,6 @@
 <!doctype html>
 <html lang="es" class="scroll-smooth">
 <head>
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-<script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Chamba Fácil — Crear mi perfil</title>
@@ -23,12 +20,12 @@
   </script>
 
   <!-- Leaflet (mapa) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin />
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase (defer) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
   <!-- Configuración Firebase (reemplaza por la tuya) -->
   <script>
@@ -41,12 +38,15 @@
       appId: "APP_ID"
     };
     let db = null;
-    try {
-      if (FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
-        firebase.initializeApp(FIREBASE_CONFIG);
-        db = firebase.firestore();
-      }
-    } catch (e) { console.warn('Firebase no inicializado:', e); }
+    // La inicialización real ocurrirá cuando el navegador haya cargado los scripts defer.
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        if (FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+          if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+          db = firebase.firestore();
+        }
+      } catch (e) { console.warn('Firebase no inicializado:', e); }
+    });
   </script>
 
   <!-- Cloudinary Unsigned Upload (reemplaza por los tuyos) -->
@@ -219,29 +219,36 @@
     </div>
   </main>
 
+  <!-- ====== LÓGICA MAPA Y FORM ====== -->
   <script>
     // --- Mapa ---
     let map, marker;
+
     function ensureMap(){
       if(map) return;
+      if (!window.L) { console.warn('Leaflet aún no está listo'); return; }
       map = L.map('map').setView([19.7008, -101.1844], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap'}).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+
       map.on('click', (e) => {
         setLatLng(e.latlng.lat, e.latlng.lng);
         placeMarker(e.latlng.lat, e.latlng.lng);
       });
     }
+
     function placeMarker(lat, lng){
       if(!map) return;
       if(marker){ marker.remove(); }
       marker = L.marker([lat, lng]).addTo(map).bindPopup('Ubicación seleccionada').openPopup();
       map.setView([lat, lng], 15);
     }
+
     function setLatLng(lat, lng){
       document.getElementById('lat').value = (Math.round(lat*1e6)/1e6).toString();
       document.getElementById('lng').value = (Math.round(lng*1e6)/1e6).toString();
     }
-    window.addEventListener('DOMContentLoaded', ensureMap);
 
     async function getGeolocation(){
       return new Promise((res, rej) => {
@@ -253,19 +260,29 @@
         );
       });
     }
-    document.getElementById('btn-geo').onclick = async () => {
-      try{
-        const pos = await getGeolocation();
-        setLatLng(pos.lat, pos.lng);
-        placeMarker(pos.lat, pos.lng);
-      }catch(e){ alert('Activa tu ubicación y vuelve a intentar.'); }
-    };
-    document.getElementById('btn-map-center').onclick = () => {
-      if(!map) return;
-      const c = map.getCenter();
-      setLatLng(c.lat, c.lng);
-      placeMarker(c.lat, c.lng);
-    };
+
+    // Botones de ubicación
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnGeo = document.getElementById('btn-geo');
+      const btnCenter = document.getElementById('btn-map-center');
+
+      btnGeo?.addEventListener('click', async () => {
+        try{
+          const pos = await getGeolocation();
+          setLatLng(pos.lat, pos.lng);
+          ensureMap();
+          placeMarker(pos.lat, pos.lng);
+        }catch(e){ alert('Activa tu ubicación y vuelve a intentar.'); }
+      });
+
+      btnCenter?.addEventListener('click', () => {
+        ensureMap();
+        if(!map) return;
+        const c = map.getCenter();
+        setLatLng(c.lat, c.lng);
+        placeMarker(c.lat, c.lng);
+      });
+    });
   </script>
 
   <script>
@@ -394,7 +411,7 @@
         // 3) Guardar en Firestore
         if (db) {
           await db.collection('profiles').add(payload);
-          msg.textContent = 'Perfil guardado con éxito. Quedará visible tras verificar el pago.';
+          msg.textContent = '✅ Perfil guardado. Quedará visible tras verificar el pago.';
         } else {
           msg.textContent = 'Perfil preparado (configura Firebase para guardar en base de datos).';
         }
@@ -412,7 +429,59 @@
     }
   </script>
 
-  <!-- Analytics (reemplaza tu GA4) -->
+  <!-- Modal confirmación (contenedor) -->
+  <div id="confirm-modal" class="modal-backdrop">
+    <div class="modal p-4 md:p-6">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-xl font-semibold">Confirmar registro</h3>
+        <button onclick="closeConfirm()" class="rounded-lg border px-3 py-1">Cerrar</button>
+      </div>
+      <div class="mt-4 grid md:grid-cols-2 gap-4">
+        <div>
+          <h4 class="font-semibold mb-2">Datos</h4>
+          <div id="confirm-json" class="text-sm mono bg-slate-50 rounded-lg p-3 overflow-auto"></div>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Checklist</h4>
+          <ul class="list-disc pl-5 text-sm space-y-1">
+            <li>Nombre y WhatsApp válidos</li>
+            <li>Especialidad seleccionada</li>
+            <li>Fotos (opcional, recomendado)</li>
+            <li>Ubicación marcada (opcional, recomendado)</li>
+            <li>Pago declarado y comprobante adjunto (recomendado)</li>
+          </ul>
+          <button id="confirm-submit" class="mt-4 rounded-xl bg-primary-600 px-4 py-2 text-white">Confirmar y guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAZY-INIT DEL MAPA: pegar siempre al final, antes de analytics -->
+  <script>
+    // Crea el mapa del admin SOLO cuando el contenedor entra al viewport
+    function initAdminMapWhenVisible(){
+      const target = document.getElementById('map');
+      if (!target) return;
+
+      if ('IntersectionObserver' in window){
+        const io = new IntersectionObserver((entries) => {
+          if (entries.some(e => e.isIntersecting)){
+            ensureMap();     // usa tu ensureMap existente
+            io.disconnect(); // ya no necesitamos observar
+          }
+        }, { rootMargin: '200px 0px' }); // inicia un poco antes de que sea visible
+        io.observe(target);
+      } else {
+        // Fallback para navegadores antiguos
+        ensureMap();
+      }
+    }
+
+    // En lugar de llamar ensureMap() en DOMContentLoaded, llamamos al lazy-init:
+    window.addEventListener('DOMContentLoaded', initAdminMapWhenVisible);
+  </script>
+
+  <!-- Analytics (GA4) -->
   <script src="/js/analytics.js" data-ga-id="G-RY7GC75EPC"></script>
 </body>
 </html>
