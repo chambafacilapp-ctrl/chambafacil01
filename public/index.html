@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- ======= SEO BÁSICO INSERTADO ======= -->
+
+  <!-- ======= SEO BÁSICO ======= -->
   <link id="canonical" rel="canonical" href="https://chambafacil.app/">
   <link rel="alternate" href="https://chambafacil.app/" hreflang="es-mx">
   <meta http-equiv="Content-Language" content="es-MX">
@@ -17,20 +18,14 @@
   <meta property="og:description" content="Publica tu perfil con fotos y ubicación. Conecta con clientes locales.">
   <meta property="og:image" content="/og-default.png">
   <meta property="og:locale" content="es_MX">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Chamba Fácil — Oficios cerca de ti">
+  <meta name="twitter:description" content="Publica tu perfil con fotos y ubicación. Conecta con clientes locales.">
+  <meta name="twitter:image" content="/og-default.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
   <link rel="manifest" href="/manifest.webmanifest">
-
-  <!-- Google tag (gtag.js) - GA4 Manual -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RY7GC75EPC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-RY7GC75EPC');
-  </script>
-
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -39,8 +34,16 @@
     "url": "https://chambafacil.app/",
     "description": "Marketplace de oficios locales en México",
     "inLanguage": "es-MX",
-    "publisher": {"@type": "Organization","name": "Chamba Fácil","email": "chambafacil8@gmail.com"},
-    "potentialAction": {"@type": "SearchAction","target": "https://chambafacil.app/?q={search_term_string}","query-input": "required name=search_term_string"}
+    "publisher": {
+      "@type": "Organization",
+      "name": "Chamba Fácil",
+      "email": "chambafacil8@gmail.com"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://chambafacil.app/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
   }
   </script>
   <script type="application/ld+json">
@@ -50,7 +53,13 @@
     "name": "Inscripción anual Chamba Fácil",
     "description": "Publica tu perfil por especialidad y aparece en el mapa cercano.",
     "brand": "Chamba Fácil",
-    "offers": {"@type": "Offer","price": "150.00","priceCurrency": "MXN","availability": "https://schema.org/InStock","url": "#pagos"}
+    "offers": {
+      "@type": "Offer",
+      "price": "150.00",
+      "priceCurrency": "MXN",
+      "availability": "https://schema.org/InStock",
+      "url": "#pagos"
+    }
   }
   </script>
   <script>
@@ -62,16 +71,29 @@
       }catch(e){}
     })();
   </script>
+  <!-- ===== FIN SEO ===== -->
+
+  <!-- GA4 manual -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RY7GC75EPC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RY7GC75EPC');
+  </script>
 
   <meta name="theme-color" content="#f97316">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { theme: { extend: { colors: { primary: {500:'#f97316',600:'#ea580c',700:'#c2410c'} } } } }</script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: {500:'#f97316',600:'#ea580c',700:'#c2410c'} } } } }
+  </script>
 
   <!-- Leaflet (mapa) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-  <!-- Firebase (defer) -->
+  <!-- Firebase -->
   <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
   <script>
@@ -83,30 +105,22 @@
       messagingSenderId:"SENDER_ID",
       appId:"APP_ID"
     };
-    let db=null;
-    document.addEventListener('DOMContentLoaded', () => {
-      try{
-        if(FIREBASE_CONFIG.apiKey!=='YOUR_API_KEY' && window.firebase){
-          if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-          db=firebase.firestore();
-        }
-      }catch(e){ console.warn('Firebase no inicializado:', e); }
+    let db=null; document.addEventListener('DOMContentLoaded',()=>{
+      try{ if(FIREBASE_CONFIG.apiKey!=='YOUR_API_KEY' && window.firebase){
+        if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db=firebase.firestore();
+      }}catch(e){}
     });
   </script>
 
   <!-- Cloudinary (mostrar imágenes) -->
   <script>
     const CLOUDINARY_CLOUD_NAME="demo"; // cambia por tu cloud_name
-    function cldImg(id,w=640){
-      const save = (navigator.connection && (navigator.connection.saveData || navigator.connection.effectiveType === '2g'));
-      const q = save ? 'q_50' : 'q_auto';
-      return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,${q},w_${w}/${id}.jpg`;
-    }
+    function cldImg(id,w=640){ return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto,w_${w}/${id}.jpg`; }
     function cldSrcSet(id){ return [320,480,640,960,1200].map(w=>`${cldImg(id,w)} ${w}w`).join(','); }
   </script>
 
   <style>
-    #map { min-height: 320px; }
     .modal-backdrop{ position: fixed; inset: 0; background: rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index: 60; }
     .modal{ background:#fff; border-radius: 1rem; max-width: 960px; width: 95%; max-height: 90vh; overflow: auto; }
     .modal.open{ display:flex; }
@@ -126,7 +140,7 @@
           <a href="#pagos" class="hover:text-primary-600">Pagos</a>
         </nav>
         <div class="flex gap-2">
-          <a href="/pago-previo.html" class="hidden md:inline-block rounded-xl border px-4 py-2">Crear mi perfil</a>
+          <a href="/admin.html" class="hidden md:inline-block rounded-xl border px-4 py-2">Crear mi perfil</a>
           <a href="https://wa.me/524434813662" class="hidden md:inline-block rounded-xl bg-primary-600 px-4 py-2 text-white">WhatsApp</a>
         </div>
       </div>
@@ -139,14 +153,12 @@
         <h1 class="text-4xl font-extrabold">Conecta con clientes y oficios locales con <span class="text-primary-600">Chamba Fácil</span></h1>
         <p class="mt-4 text-slate-600">Publica tu perfil, sube tus fotos y aparece en el mapa “cerca de mí”.</p>
         <div class="mt-6 flex gap-3 flex-wrap">
-          <a href="/pago-previo.html" class="rounded-xl bg-primary-600 px-6 py-3 text-white">Crear mi perfil</a>
+          <a href="/admin.html" class="rounded-xl bg-primary-600 px-6 py-3 text-white">Crear mi perfil</a>
           <a href="#pagos" class="rounded-xl border px-6 py-3">Inscribirme</a>
           <a href="#categorias" class="rounded-xl border px-6 py-3">Ver categorías</a>
         </div>
       </div>
-      <img class="rounded-3xl shadow"
-           src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop"
-           alt="mockup" decoding="async" fetchpriority="high">
+      <img class="rounded-3xl shadow" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop" alt="mockup">
     </div>
   </section>
 
@@ -246,10 +258,9 @@
   <section id="pagos" class="py-16 bg-slate-50">
     <div class="mx-auto container px-4">
       <h2 class="text-3xl font-bold text-center">Portal de pagos</h2>
-      <p class="mt-2 text-center text-slate-600">Transferencia (SPEI) y OXXO por Mercado Pago.</p>
+      <p class="mt-2 text-center text-slate-600">Transferencia (SPEI) y OXXO (próximamente Mercado Pago).</p>
 
       <div class="mt-8 grid gap-6 md:grid-cols-2">
-        <!-- SPEI -->
         <div class="rounded-2xl border p-6 bg-white">
           <h3 class="text-xl font-semibold">Transferencia (SPEI)</h3>
           <p class="mt-2 text-sm text-slate-600">Realiza transferencia y envía tu comprobante.</p>
@@ -266,15 +277,15 @@
             <input type="hidden" name="_captcha" value="false">
             <input type="text" name="nombre" required placeholder="Tu nombre" class="rounded-xl border px-3 py-2">
             <input type="email" name="email" required placeholder="Tu correo" class="rounded-xl border px-3 py-2">
+            <input type="text" name="telefono" placeholder="WhatsApp" class="rounded-xl border px-3 py-2">
             <input type="file" name="comprobante" accept="image/*,application/pdf" class="rounded-xl border px-3 py-2">
             <button class="rounded-xl bg-primary-600 px-4 py-2 text-white hover:bg-primary-700">Enviar comprobante</button>
           </form>
         </div>
 
-        <!-- OXXO / MP (plan único) -->
         <div class="rounded-2xl border p-6 bg-white">
           <h3 class="text-xl font-semibold">Pago en OXXO</h3>
-          <p class="mt-2 text-sm text-slate-600">Se generará una referencia por Mercado Pago.</p>
+          <p class="mt-2 text-sm text-slate-600">Se habilitará con Mercado Pago.</p>
           <div class="flex flex-col gap-2 mt-3">
             <button onclick="pagar('annual')" class="rounded-xl bg-primary-600 px-4 py-2 text-white">
               Inscripción anual ($150 MXN)
@@ -316,18 +327,14 @@
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 
-  <!-- Mercado Pago SDK -->
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <!-- NOTA: SDK de Mercado Pago desactivado temporalmente -->
+  <!-- <script src="https://sdk.mercadopago.com/js/v2"></script> -->
+
   <script>
-    const mp = new MercadoPago('PUBLIC_KEY_PLACEHOLDER', { locale: 'es-MX' });
-    async function pagar(plan){
-      const res = await fetch('/api/create-preference', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ plan })});
-      const data = await res.json();
-      if (data?.init_point || data?.sandbox_init_point) {
-        location.href = data.init_point || data.sandbox_init_point;
-      } else {
-        alert('No se pudo crear la orden');
-      }
+    // Redirección temporal de pago
+    function pagar(plan){
+      // En esta fase, mandamos al flujo previo antes de admin
+      location.href = '/pago-previo.html';
     }
   </script>
 
@@ -335,57 +342,7 @@
     const CATEGORIES = ["Albañilería","Jardinería","Plomería","Electricidad","Mecánicos","Estilistas","Cerrajeros","Zapateros"];
     let activeCategory = null;
     let allProfilesCache = [];
-  </script>
 
-  <script>
-    /* ====== Geocerca + mapa (init robusto + lazy) ====== */
-    let userLoc = null; let map, userMarker, markersLayer;
-    const PAGE_SIZE = 12; let page=1; let lastItems=[];
-
-    function distKm(a,b){ const toRad=d=>d*Math.PI/180, R=6371;
-      const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
-      const sa=Math.sin(dLat/2), sb=Math.sin(dLng/2);
-      const A=sa*sa + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*sb*sb;
-      return 2*R*Math.atan2(Math.sqrt(Math.sqrt(A*A)));// numerically stable? keep original:
-    }
-  </script>
-  <script>
-    // re-define distKm correctly (prev line had an issue during paste)
-    function distKm(a,b){ const toRad=d=>d*Math.PI/180, R=6371;
-      const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
-      const sa=Math.sin(dLat/2), sb=Math.sin(dLng/2);
-      const A=sa*sa + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*sb*sb;
-      return 2*R*Math.atan2(Math.sqrt(A),Math.sqrt(1-A));
-    }
-    function ensureMap(){
-      if (map) return;
-      if (!window.L || !L.map) { setTimeout(ensureMap, 120); return; }
-      try{
-        map = L.map('map').setView([19.7008, -101.1844], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap'}).addTo(map);
-        markersLayer = L.layerGroup().addTo(map);
-      }catch(e){ setTimeout(ensureMap, 150); }
-    }
-    function updateMap(user, items){
-      ensureMap();
-      if (!markersLayer) return;
-      markersLayer.clearLayers();
-      if (user){
-        if (userMarker) markersLayer.removeLayer(userMarker);
-        userMarker = L.marker([user.lat, user.lng], { title:'Tú' }).addTo(markersLayer).bindPopup('Tu ubicación');
-      }
-      for (const p of items){
-        if (!p.location || typeof p.location.lat!=='number') continue;
-        const m=L.marker([p.location.lat, p.location.lng], {title:p.name||'Oficio'});
-        m.bindPopup(`<strong>${p.name||'Oficio'}</strong><br>${p.oficio||''} · ${p.ciudad||''}`);
-        markersLayer.addLayer(m);
-      }
-      try{ const group=L.featureGroup(markersLayer.getLayers()); map.fitBounds(group.getBounds().pad(0.2)); }catch(e){}
-    }
-    function getGeolocation(){ return new Promise((res,rej)=>{
-      if (!navigator.geolocation) return rej(new Error('Geolocalización no disponible'));
-      navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}), rej, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
-    }); }
     async function fetchProfiles(limit=500){
       if (window.db){
         const snap = await db.collection('profiles').orderBy('createdAt','desc').limit(limit).get();
@@ -393,19 +350,16 @@
       }
       return Array.from({length:12}).map((_,i)=>({name:`Oficio ${i+1}`, oficio:CATEGORIES[i%8], ciudad:'', photos:['sample'], rating:4.5}));
     }
-    async function fetchByCategory(cat, limit=500){
-      if (!cat){ return allProfilesCache; }
-      if (window.db){
-        const snap = await db.collection('profiles').where('oficio','==',cat).limit(limit).get();
-        return snap.docs.map(d=>d.data());
-      }
-      return allProfilesCache.filter(p => (p.oficio||'').toLowerCase()===cat.toLowerCase());
-    }
+
     function computeCounts(profiles){
       const counts = Object.fromEntries(CATEGORIES.map(c=>[c,0]));
-      for(const p of profiles){ const cat = (p.oficio||'').trim(); if (counts.hasOwnProperty(cat)) counts[cat]++; }
+      for(const p of profiles){
+        const cat = (p.oficio||'').trim();
+        if (counts.hasOwnProperty(cat)) counts[cat]++;
+      }
       return counts;
     }
+
     function renderCategories(counts){
       const grid = document.getElementById('cat-grid');
       grid.innerHTML = CATEGORIES.map(cat => {
@@ -419,22 +373,78 @@
         </article>`;
       }).join('');
     }
+
     function entrarCategoria(cat){
       activeCategory = cat;
       applyFilterByCategory();
       const oficios = document.getElementById('oficios');
       if (oficios) oficios.scrollIntoView({ behavior:'smooth', block:'start' });
     }
+  </script>
+
+  <script>
+    let userLoc = null;   // {lat,lng}
+    let map, userMarker, markersLayer;
+    const PAGE_SIZE = 12; let page=1; let lastItems=[];
+
+    function cldImg(id,w=640){ return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto,w_${w}/${id}.jpg`; }
+    function cldSrcSet(id){ return [320,480,640,960,1200].map(w=>`${cldImg(id,w)} ${w}w`).join(','); }
+
+    function distKm(a,b){ const toRad=d=>d*Math.PI/180, R=6371;
+      const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+      const sa=Math.sin(dLat/2), sb=Math.sin(dLng/2);
+      const A=sa*sa + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*sb*sb;
+      return 2*R*Math.atan2(Math.sqrt(A),Math.sqrt(1-A));
+    }
+    function ensureMap(){
+      if (map) return;
+      map = L.map('map').setView([19.7008, -101.1844], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap'}).addTo(map);
+      markersLayer = L.layerGroup().addTo(map);
+    }
+    function updateMap(user, items){
+      ensureMap(); markersLayer.clearLayers();
+      if (user){
+        if (userMarker) markersLayer.removeLayer(userMarker);
+        userMarker = L.marker([user.lat, user.lng], { title:'Tú' }).addTo(markersLayer).bindPopup('Tu ubicación');
+      }
+      for (const p of items){
+        if (!p.location || typeof p.location.lat!=='number') continue;
+        const m=L.marker([p.location.lat,p.location.lng], {title:p.name||'Oficio'});
+        m.bindPopup(`<strong>${p.name||'Oficio'}</strong><br>${p.oficio||''} · ${p.ciudad||''}`);
+        markersLayer.addLayer(m);
+      }
+      const group=L.featureGroup(markersLayer.getLayers());
+      try{ map.fitBounds(group.getBounds().pad(0.2)); }catch(e){}
+    }
+    function getGeolocation(){ return new Promise((res,rej)=>{
+      if (!navigator.geolocation) return rej(new Error('Geolocalización no disponible'));
+      navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}), rej, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+    }); }
+
+    async function fetchByCategory(cat, limit=500){
+      if (!cat){ return allProfilesCache; }
+      if (window.db){
+        const snap = await db.collection('profiles').where('oficio','==',cat).limit(limit).get();
+        return snap.docs.map(d=>d.data());
+      }
+      return allProfilesCache.filter(p => (p.oficio||'').toLowerCase()===cat.toLowerCase());
+    }
+
     function renderSlice(items){
       lastItems = items || [];
       const list = document.getElementById('profiles-list');
       const empty = document.getElementById('empty-state');
+
       if (!lastItems.length){
         const catTxt = activeCategory ? activeCategory.toLowerCase() : "esta búsqueda";
         const radiusKm = Number(document.getElementById('radius').value || 10);
         empty.textContent = `Aún no hay ${catTxt} cerca, prueba ampliar el radio (actual: ${radiusKm} km).`;
         empty.classList.remove('hidden');
-      } else { empty.classList.add('hidden'); }
+      } else {
+        empty.classList.add('hidden');
+      }
+
       list.innerHTML = lastItems.map((p,i)=>{
         const img = p.photos?.[0] || 'sample';
         const phone = (p.phone || '524434813662').replace(/\D+/g,'');
@@ -452,6 +462,7 @@
         </article>`;
       }).join('');
     }
+
     function verEnMapa(i){
       const p = lastItems[i];
       if (!p || !p.location || typeof p.location.lat!=='number' || typeof p.location.lng!=='number'){
@@ -464,6 +475,7 @@
       L.popup().setLatLng(latlng).setContent(`<strong>${p.name||'Oficio'}</strong><br>${p.oficio||''} · ${p.ciudad||''}`).openOn(map);
       document.getElementById('map').scrollIntoView({ behavior:'smooth', block:'center' });
     }
+
     function verPerfil(i){
       const p = lastItems[i]; if (!p) return;
       document.getElementById('perfil-title').textContent = p.name || 'Perfil';
@@ -478,9 +490,14 @@
         <img class="w-full h-28 object-cover rounded-lg" src="${cldImg(id,480)}" srcset="${cldSrcSet(id)}" alt="Foto del trabajo">
       `).join('');
       const btnMapa = document.getElementById('perfil-ver-mapa');
-      btnMapa.onclick = () => { closePerfil(); const idx = lastItems.indexOf(p); if (idx>=0) verEnMapa(idx); }
+      btnMapa.onclick = () => {
+        closePerfil();
+        const idx = lastItems.indexOf(p);
+        if (idx>=0) verEnMapa(idx);
+      }
       openPerfil();
     }
+
     function openPerfil(){ document.getElementById('perfil-modal').classList.add('open'); }
     function closePerfil(){ document.getElementById('perfil-modal').classList.remove('open'); }
 
@@ -492,6 +509,7 @@
         .filter(p => p.__d <= radiusKm)
         .sort((a,b)=>a.__d - b.__d);
     }
+
     async function applyNearMe(){
       const radiusKm = Number(document.getElementById('radius').value || 10);
       let base = activeCategory ? await fetchByCategory(activeCategory) : allProfilesCache;
@@ -500,6 +518,7 @@
       document.getElementById('page-label').textContent = userLoc ? `Resultados a ${radiusKm} km (ordenados por cercanía)` : `Últimos perfiles`;
       updateMap(userLoc, filtered.slice(0,50));
     }
+
     async function applyFilterByCategory(){
       const radiusKm = Number(document.getElementById('radius').value || 10);
       let base = await fetchByCategory(activeCategory);
@@ -536,17 +555,8 @@
       allProfilesCache = await fetchProfiles(500);
       const counts = computeCounts(allProfilesCache);
       renderCategories(counts);
-      const target = document.getElementById('oficios');
-      if ('IntersectionObserver' in window && target){
-        const io = new IntersectionObserver((entries) => {
-          if (entries.some(e => e.isIntersecting)){
-            ensureMap(); applyNearMe(); io.disconnect();
-          }
-        }, { rootMargin: '200px 0px' });
-        io.observe(target);
-      } else {
-        ensureMap(); applyNearMe();
-      }
+      ensureMap();
+      applyNearMe();
     }
     window.addEventListener('DOMContentLoaded', startup);
   </script>
