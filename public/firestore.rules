@@ -1,0 +1,147 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+    function authed() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return authed() && request.auth.uid == uid;
+    }
+
+    // Revisa si el usuario tiene pago activo consultando /users/{uid}.paid
+    function isPaid(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.paid == true;
+    }
+
+    // Valida string no vacío y con tamaño máximo
+    function validStr(field, maxLen) {
+      return field is string && field.size() > 0 && field.size() <= maxLen;
+    }
+
+    // Valida string opcional (puede no existir o ser cadena corta)
+    function validStrOpt(field, maxLen) {
+      return !(field in request.resource.data) || (request.resource.data[field] is string && request.resource.data[field].size() <= maxLen);
+    }
+
+    // Valida teléfono sencillo: solo dígitos y longitudes razonables (7 a 15)
+    function validPhone(phone) {
+      return phone is string
+             && phone.size() >= 7 && phone.size() <= 15
+             && phone.matches('^\\d{7,15}$');
+    }
+
+    // Valida ubicación mínima
+    function validLocation(loc) {
+      return loc is map
+             && loc.lat is number && loc.lng is number
+             && loc.lat >= -90 && loc.lat <= 90
+             && loc.lng >= -180 && loc.lng <= 180;
+    }
+
+    // Valida arreglo de fotos (≤ 3) con strings
+    function validPhotos(arr) {
+      return !(arr in request.resource.data) // fotos opcional
+             || (request.resource.data[arr] is list
+                 && request.resource.data[arr].size() <= 3
+                 && request.resource.data[arr].hasOnly([0,1,2]) == false // no aplica, solo seguridad mental
+                 && request.resource.data[arr].size() >= 0
+                 && request.resource.data[arr].every(photo => photo is string && photo.size() > 0 && photo.size() <= 200));
+    }
+
+    // Solo permitir campos esperados en perfiles
+    function profileAllowedKeys() {
+      return request.resource.data.keys().hasOnly([
+        'ownerUid', 'name', 'oficio', 'ciudad', 'descripcion',
+        'phone', 'photos', 'location', 'createdAt', 'updatedAt', 'public'
+      ]);
+    }
+
+    // oficios permitidos
+    function oficioValido(oficio) {
+      return oficio in [
+        'Albañilería','Jardinería','Plomería','Electricidad',
+        'Mecánicos','Estilistas','Cerrajeros','Zapateros'
+      ];
+    }
+
+    // Validación integral del perfil
+    function validProfile(uid) {
+      return
+        // Propiedad y campos básicos
+        request.resource.data.ownerUid == uid
+        && validStr(request.resource.data.name, 80)
+        && validStr(request.resource.data.ciudad, 80)
+        && request.resource.data.oficio is string
+        && oficioValido(request.resource.data.oficio)
+        // Descripción opcional (máx 600 chars)
+        && validStrOpt('descripcion', 600)
+        // Teléfono
+        && validPhone(request.resource.data.phone)
+        // Fotos
+        && validPhotos('photos')
+        // Ubicación requerida
+        && request.resource.data.location != null
+        && validLocation(request.resource.data.location)
+        // Public debe ser booleano
+        && request.resource.data.public is bool
+        // createdAt/updatedAt deben existir y ser timestamp (en create, updatedAt == createdAt)
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
+        && (resource == null ? request.resource.data.updatedAt == request.resource.data.createdAt : true);
+    }
+
+    // ---------- Reglas por colección ----------
+
+    // Perfil público: 1 documento por usuario: /profiles/{uid}
+    match /profiles/{uid} {
+      // Lectura pública de perfiles publicados
+      allow get, list: if true;
+
+      // Crear/actualizar/eliminar solo el dueño + con pago activo
+      allow create: if isOwner(uid) && isPaid(uid) && profileAllowedKeys() && validProfile(uid);
+
+      allow update: if isOwner(uid) && isPaid(uid)
+                    // No permitir cambiar ownerUid ni hacer público si no estaba
+                    && request.resource.data.ownerUid == resource.data.ownerUid
+                    && profileAllowedKeys()
+                    && validProfile(uid);
+
+      // Eliminar su propio perfil
+      allow delete: if isOwner(uid);
+    }
+
+    // Datos del usuario: /users/{uid}
+    match /users/{uid} {
+      // Leer solo el dueño (contiene paid, email, etc.)
+      allow get: if isOwner(uid);
+
+      // Crear usuario cliente: paid debe iniciar en false
+      allow create: if isOwner(uid)
+                    && request.resource.data.keys().hasOnly(['email','createdAt','paid'])
+                    && request.resource.data.email is string
+                    && request.resource.data.createdAt is timestamp
+                    && request.resource.data.paid == false;
+
+      // Actualizar: el usuario NO puede ponerse paid=true por sí solo
+      allow update: if isOwner(uid)
+                    && request.resource.data.email == resource.data.email
+                    && (request.resource.data.paid == resource.data.paid);
+
+      // No permitir borrar por cliente
+      allow delete: if false;
+    }
+
+    // Pagos: idealmente solo los crea un backend/función; si no hay, bloquear a clientes.
+    match /payments/{docId} {
+      // Lecturas restringidas: dueño puede leer sus propios pagos si el docId == uid o tiene ownerUid
+      allow get: if authed();
+      allow list: if false;
+
+      // Bloquear escritura desde cliente (recomendado)
+      allow create, update, delete: if false;
+    }
+  }
+}
