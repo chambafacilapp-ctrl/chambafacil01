@@ -28,30 +28,47 @@
   <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 
-  <!-- Configuración Firebase (init tras DOMContentLoaded) -->
+  <!-- Configuración Firebase (reemplaza con tu config real) -->
   <script>
     const FIREBASE_CONFIG = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROJECT_ID.firebaseapp.com",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_PROJECT_ID.appspot.com",
       messagingSenderId: "SENDER_ID",
       appId: "APP_ID"
     };
+
     let db = null, auth = null;
+
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        if (FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY' && window.firebase) {
-          if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-          db = firebase.firestore();
-          auth = firebase.auth();
-          await auth.signInAnonymously();
-        }
-      } catch (e) { console.warn('Firebase/Auth no inicializado:', e); }
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        auth = firebase.auth();
+
+        // Escucha de sesión
+        auth.onAuthStateChanged((user) => {
+          const formWrap = document.getElementById('form-wrap');
+          const authWrap = document.getElementById('auth-wrap');
+          const userBadge = document.getElementById('user-badge');
+          if (user) {
+            authWrap.classList.add('hidden');
+            formWrap.classList.remove('hidden');
+            userBadge.textContent = `Sesión: ${user.email || user.uid}`;
+          } else {
+            formWrap.classList.add('hidden');
+            authWrap.classList.remove('hidden');
+            userBadge.textContent = 'Sin sesión';
+          }
+        });
+      } catch (e) {
+        console.warn('Firebase no inicializado:', e);
+      }
     });
   </script>
 
-  <!-- Cloudinary Unsigned Upload -->
+  <!-- Cloudinary Unsigned Upload (reemplaza con tus valores) -->
   <script>
     const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";
     const CLOUDINARY_UNSIGNED_PRESET = "YOUR_UNSIGNED_PRESET";
@@ -93,104 +110,137 @@
     <div class="max-w-3xl mx-auto">
       <h1 class="text-3xl font-extrabold">Crear mi perfil</h1>
       <p class="mt-2 text-slate-600">Completa los datos para aparecer por especialidad y en el mapa “cerca de mí”.</p>
+      <p class="text-xs text-slate-500 mt-1" id="user-badge">Sin sesión</p>
 
-      <div class="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800">
-        <strong>Requisito:</strong> haber realizado tu <span class="font-semibold">inscripción anual</span> ($150 MXN).
-        Tu perfil quedará <em>pendiente de verificación</em> hasta aprobar el pago.
-      </div>
+      <!-- Card de Auth -->
+      <section id="auth-wrap" class="mt-6 bg-white border rounded-2xl p-6 shadow">
+        <h2 class="text-xl font-semibold">Acceder</h2>
+        <p class="text-slate-600 text-sm mt-1">Inicia sesión o crea tu cuenta para registrar tu perfil.</p>
 
-      <!-- Formulario -->
-      <form id="profile-form" class="mt-6 grid gap-4 bg-white rounded-2xl p-6 shadow">
-        <div class="grid md:grid-cols-2 gap-4">
-          <label class="grid gap-1">
-            <span class="text-sm font-medium">Nombre completo *</span>
-            <input required name="name" class="rounded-xl border px-3 py-2" placeholder="Ej. José Pérez" />
-          </label>
-          <label class="grid gap-1">
-            <span class="text-sm font-medium">WhatsApp (10–15 dígitos) *</span>
-            <input required name="phone" class="rounded-xl border px-3 py-2" placeholder="Ej. 4431234567" />
-          </label>
+        <div class="grid md:grid-cols-2 gap-4 mt-4">
+          <div>
+            <h3 class="font-medium">Iniciar sesión</h3>
+            <input id="login-email" type="email" placeholder="correo@ejemplo.com" class="mt-2 w-full rounded-xl border px-3 py-2">
+            <input id="login-pass" type="password" placeholder="Contraseña" class="mt-2 w-full rounded-xl border px-3 py-2">
+            <button id="btn-login" class="mt-3 rounded-xl bg-primary-600 px-4 py-2 text-white">Entrar</button>
+            <button id="btn-reset" class="mt-3 ml-2 rounded-xl border px-4 py-2">Olvidé mi contraseña</button>
+            <p id="auth-msg-login" class="text-sm text-slate-600 mt-2"></p>
+          </div>
+
+          <div>
+            <h3 class="font-medium">Crear cuenta</h3>
+            <input id="reg-email" type="email" placeholder="correo@ejemplo.com" class="mt-2 w-full rounded-xl border px-3 py-2">
+            <input id="reg-pass" type="password" placeholder="Contraseña (mín. 6)" class="mt-2 w-full rounded-xl border px-3 py-2">
+            <button id="btn-register" class="mt-3 rounded-xl border px-4 py-2">Registrarme</button>
+            <p id="auth-msg-register" class="text-sm text-slate-600 mt-2"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENVOLTORIO DEL FORM PARA OCULTARLO SI NO HAY SESIÓN -->
+      <section id="form-wrap" class="hidden">
+        <div class="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800">
+          <strong>Requisito:</strong> haber realizado tu <span class="font-semibold">inscripción anual</span> ($150 MXN).
+          Tu perfil quedará <em>pendiente de verificación</em> hasta aprobar el pago.
         </div>
 
-        <div class="grid md:grid-cols-2 gap-4">
-          <label class="grid gap-1">
-            <span class="text-sm font-medium">Especialidad *</span>
-            <select required name="oficio" class="rounded-xl border px-3 py-2">
-              <option value="">Selecciona...</option>
-              <option>Albañilería</option>
-              <option>Jardinería</option>
-              <option>Plomería</option>
-              <option>Electricidad</option>
-              <option>Mecánicos</option>
-              <option>Estilistas</option>
-              <option>Cerrajeros</option>
-              <option>Zapateros</option>
-            </select>
-          </label>
-          <label class="grid gap-1">
-            <span class="text-sm font-medium">Ciudad</span>
-            <input name="ciudad" class="rounded-xl border px-3 py-2" placeholder="Ej. Morelia, Mich." />
-          </label>
-        </div>
+        <!-- Formulario -->
+        <form id="profile-form" class="mt-6 grid gap-4 bg-white rounded-2xl p-6 shadow">
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">Nombre completo *</span>
+              <input required name="name" class="rounded-xl border px-3 py-2" placeholder="Ej. José Pérez" />
+            </label>
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">WhatsApp (10–15 dígitos) *</span>
+              <input required name="phone" class="rounded-xl border px-3 py-2" placeholder="Ej. 4431234567" />
+            </label>
+          </div>
 
-        <label class="grid gap-1">
-          <span class="text-sm font-medium">Descripción breve (máx. 300)</span>
-          <textarea name="descripcion" maxlength="300" rows="3" class="rounded-xl border px-3 py-2" placeholder="Experiencia, servicios, garantías..."></textarea>
-          <small id="desc-count" class="text-slate-500 text-xs">0/300</small>
-        </label>
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">Especialidad *</span>
+              <select required name="oficio" class="rounded-xl border px-3 py-2">
+                <option value="">Selecciona...</option>
+                <option>Albañilería</option>
+                <option>Jardinería</option>
+                <option>Plomería</option>
+                <option>Electricidad</option>
+                <option>Mecánicos</option>
+                <option>Estilistas</option>
+                <option>Cerrajeros</option>
+                <option>Zapateros</option>
+              </select>
+            </label>
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">Ciudad</span>
+              <input name="ciudad" class="rounded-xl border px-3 py-2" placeholder="Ej. Morelia, Mich." />
+            </label>
+          </div>
 
-        <div class="grid md:grid-cols-2 gap-4">
           <label class="grid gap-1">
-            <span class="text-sm font-medium">Fotos de tus trabajos (hasta 3, JPG/PNG, máx 10MB c/u)</span>
-            <input id="photos" type="file" accept="image/jpeg,image/png" multiple class="rounded-xl border px-3 py-2" />
-            <small class="text-slate-500">Se recomienda subir al menos una foto.</small>
-            <div id="photos-errors" class="text-red-600 text-sm"></div>
+            <span class="text-sm font-medium">Descripción breve (máx. 300)</span>
+            <textarea name="descripcion" maxlength="300" rows="3" class="rounded-xl border px-3 py-2" placeholder="Experiencia, servicios, garantías..."></textarea>
+            <small id="desc-count" class="text-slate-500 text-xs">0/300</small>
           </label>
-          <div class="grid gap-2">
-            <span class="text-sm font-medium">Ubicación</span>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">Fotos de tus trabajos (hasta 3, JPG/PNG, máx 10MB c/u)</span>
+              <input id="photos" type="file" accept="image/jpeg,image/png" multiple class="rounded-xl border px-3 py-2" />
+              <small class="text-slate-500">Se recomienda subir al menos una foto.</small>
+              <div id="photos-errors" class="text-red-600 text-sm"></div>
+            </label>
+            <div class="grid gap-2">
+              <span class="text-sm font-medium">Ubicación</span>
+              <div class="flex gap-2">
+                <button type="button" id="btn-geo" class="rounded-xl border px-3 py-2">📍 Usar mi ubicación</button>
+                <button type="button" id="btn-map-center" class="rounded-xl border px-3 py-2">Tomar del mapa</button>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <input id="lat" name="lat" class="rounded-xl border px-3 py-2" placeholder="Latitud" />
+                <input id="lng" name="lng" class="rounded-xl border px-3 py-2" placeholder="Longitud" />
+              </div>
+              <small class="text-slate-500">Sugerido: marca tu zona para aparecer “cerca de mí”.</small>
+            </div>
+          </div>
+
+          <div id="map" class="h-64 w-full border rounded-2xl"></div>
+
+          <fieldset class="border rounded-xl p-4 grid gap-3">
+            <legend class="px-2 text-sm font-medium">Verificación de pago</legend>
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">Correo con el que pagaste</span>
+              <input name="paymentEmail" type="email" class="rounded-xl border px-3 py-2" placeholder="tu@correo.com" />
+            </label>
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">Referencia/nota del pago</span>
+              <input name="paymentRef" class="rounded-xl border px-3 py-2" placeholder="Ej. MP-1234 / SPEI 9876 / OXXO 4567" />
+            </label>
+            <label class="grid gap-1">
+              <span class="text-sm font-medium">Comprobante (JPG/PNG/PDF, máx 10MB)</span>
+              <input id="receipt" type="file" accept="image/jpeg,image/png,application/pdf" class="rounded-xl border px-3 py-2" />
+            </label>
+            <label class="flex items-center gap-2">
+              <input id="declared" type="checkbox" class="rounded border" />
+              <span class="text-sm">Declaro que ya pagué la inscripción anual de $150 MXN.</span>
+            </label>
+            <p class="text-xs text-slate-600">Tu perfil quedará <strong>pendiente</strong> hasta que un administrador verifique el pago; después aparecerá público.</p>
+          </fieldset>
+
+          <div class="flex items-center justify-between pt-2">
+            <p id="form-msg" class="text-sm text-slate-600"></p>
             <div class="flex gap-2">
-              <button type="button" id="btn-geo" class="rounded-xl border px-3 py-2">📍 Usar mi ubicación</button>
-              <button type="button" id="btn-map-center" class="rounded-xl border px-3 py-2">Tomar del mapa</button>
+              <button type="button" id="btn-preview" class="rounded-xl border px-4 py-2">Vista previa</button>
+              <button id="submit-btn" class="rounded-xl bg-primary-600 px-5 py-2.5 text-white hover:bg-primary-700">Guardar perfil</button>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <input id="lat" name="lat" class="rounded-xl border px-3 py-2" placeholder="Latitud" />
-              <input id="lng" name="lng" class="rounded-xl border px-3 py-2" placeholder="Longitud" />
-            </div>
-            <small class="text-slate-500">Sugerido: marca tu zona para aparecer “cerca de mí”.</small>
           </div>
+        </form>
+
+        <div class="mt-6 flex justify-end">
+          <button id="btn-logout" class="rounded-xl border px-4 py-2">Cerrar sesión</button>
         </div>
-
-        <div id="map" class="h-64 w-full border rounded-2xl"></div>
-
-        <fieldset class="border rounded-xl p-4 grid gap-3">
-          <legend class="px-2 text-sm font-medium">Verificación de pago</legend>
-          <label class="grid gap-1">
-            <span class="text-sm font-medium">Correo con el que pagaste</span>
-            <input name="paymentEmail" type="email" class="rounded-xl border px-3 py-2" placeholder="tu@correo.com" />
-          </label>
-          <label class="grid gap-1">
-            <span class="text-sm font-medium">Referencia/nota del pago</span>
-            <input name="paymentRef" class="rounded-xl border px-3 py-2" placeholder="Ej. MP-1234 / SPEI 9876 / OXXO 4567" />
-          </label>
-          <label class="grid gap-1">
-            <span class="text-sm font-medium">Comprobante (JPG/PNG/PDF, máx 10MB)</span>
-            <input id="receipt" type="file" accept="image/jpeg,image/png,application/pdf" class="rounded-xl border px-3 py-2" />
-          </label>
-          <label class="flex items-center gap-2">
-            <input id="declared" type="checkbox" class="rounded border" />
-            <span class="text-sm">Declaro que ya pagué la inscripción anual de $150 MXN.</span>
-          </label>
-          <p class="text-xs text-slate-600">Tu perfil quedará <strong>pendiente</strong> hasta que un administrador verifique el pago; después aparecerá público.</p>
-        </fieldset>
-
-        <div class="flex items-center justify-between pt-2">
-          <p id="form-msg" class="text-sm text-slate-600"></p>
-          <div class="flex gap-2">
-            <button type="button" id="btn-preview" class="rounded-xl border px-4 py-2">Vista previa</button>
-            <button id="submit-btn" class="rounded-xl bg-primary-600 px-5 py-2.5 text-white hover:bg-primary-700">Guardar perfil</button>
-          </div>
-        </div>
-      </form>
+      </section>
 
       <!-- Modal confirmación -->
       <div id="confirm-modal" class="modal-backdrop">
@@ -222,9 +272,8 @@
     </div>
   </main>
 
-  <!-- ====== LÓGICA MAPA Y FORM ====== -->
+  <!-- ====== MAPA (init robusto + lazy) ====== -->
   <script>
-    // --- Mapa con init robusto ---
     let map, marker;
 
     function ensureMap(){
@@ -252,18 +301,33 @@
       }
     }
 
+    function initAdminMapWhenVisible(){
+      const target = document.getElementById('map');
+      if (!target) return;
+      if ('IntersectionObserver' in window){
+        const io = new IntersectionObserver((entries) => {
+          if (entries.some(e => e.isIntersecting)){
+            ensureMap();
+            io.disconnect();
+          }
+        }, { rootMargin: '200px 0px' });
+        io.observe(target);
+      } else {
+        ensureMap();
+      }
+    }
+    window.addEventListener('DOMContentLoaded', initAdminMapWhenVisible);
+
     function placeMarker(lat, lng){
       if(!map) return;
       if(marker){ marker.remove(); }
       marker = L.marker([lat, lng]).addTo(map).bindPopup('Ubicación seleccionada').openPopup();
       map.setView([lat, lng], 15);
     }
-
     function setLatLng(lat, lng){
       document.getElementById('lat').value = (Math.round(lat*1e6)/1e6).toString();
       document.getElementById('lng').value = (Math.round(lng*1e6)/1e6).toString();
     }
-
     async function getGeolocation(){
       return new Promise((res, rej) => {
         if (!navigator.geolocation) return rej(new Error('Geolocalización no disponible'));
@@ -275,7 +339,6 @@
       });
     }
 
-    // Botones de ubicación
     document.addEventListener('DOMContentLoaded', () => {
       const btnGeo = document.getElementById('btn-geo');
       const btnCenter = document.getElementById('btn-map-center');
@@ -299,8 +362,8 @@
     });
   </script>
 
+  <!-- ====== VALIDACIONES BÁSICAS ====== -->
   <script>
-    // --- Validaciones ---
     const MAX_SIZE = 10 * 1024 * 1024;
 
     function validatePhone(raw){
@@ -327,8 +390,8 @@
     }
   </script>
 
+  <!-- ====== LÓGICA DE FORM + FIRESTORE ====== -->
   <script>
-    // --- Lógica de formulario ---
     const form = document.getElementById('profile-form');
     const msg = document.getElementById('form-msg');
     const btn = document.getElementById('submit-btn');
@@ -341,8 +404,8 @@
     function openConfirm(){ document.getElementById('confirm-modal').classList.add('open'); }
     function closeConfirm(){ document.getElementById('confirm-modal').classList.remove('open'); }
 
-    btnPrev.onclick = () => previewAndConfirm();
-    form.addEventListener('submit', (e)=>{ e.preventDefault(); previewAndConfirm(true); });
+    btnPrev?.addEventListener('click', () => previewAndConfirm());
+    form?.addEventListener('submit', (e)=>{ e.preventDefault(); previewAndConfirm(true); });
 
     async function previewAndConfirm(fromSubmit=false){
       msg.textContent = '';
@@ -372,10 +435,13 @@
       const receiptErrs = validateReceipt(receiptInput.files[0]);
       if(receiptErrs.length){ msg.textContent = receiptErrs.join(' '); return; }
 
-      const ownerUid = (firebase?.auth?.().currentUser || {}).uid || null;
+      const user = (firebase?.auth?.().currentUser || null);
+      const ownerUid = user ? user.uid : null;
+      const ownerEmail = user ? (user.email || null) : null;
 
       const payload = {
         ownerUid,
+        ownerEmail,
         name, phone, oficio, ciudad, descripcion,
         location: (isFinite(lat) && isFinite(lng)) ? { lat, lng } : null,
         createdAt: new Date().toISOString(),
@@ -395,7 +461,6 @@
         `<pre class="mono text-xs whitespace-pre-wrap">${esc(JSON.stringify(payload, null, 2))}</pre>`;
 
       openConfirm();
-
       const confirmBtn = document.getElementById('confirm-submit');
       confirmBtn.onclick = async () => { await doSubmit(payload); };
     }
@@ -441,28 +506,55 @@
     }
   </script>
 
-  <!-- LAZY-INIT DEL MAPA: crea solo cuando entra al viewport -->
+  <!-- ====== AUTH HANDLERS ====== -->
   <script>
-    function initAdminMapWhenVisible(){
-      const target = document.getElementById('map');
-      if (!target) return;
+    document.addEventListener('DOMContentLoaded', () => {
+      const $ = (id) => document.getElementById(id);
 
-      if ('IntersectionObserver' in window){
-        const io = new IntersectionObserver((entries) => {
-          if (entries.some(e => e.isIntersecting)){
-            ensureMap();
-            io.disconnect();
-          }
-        }, { rootMargin: '200px 0px' });
-        io.observe(target);
-      } else {
-        ensureMap();
-      }
-    }
-    window.addEventListener('DOMContentLoaded', initAdminMapWhenVisible);
+      $('btn-login')?.addEventListener('click', async () => {
+        const email = $('login-email').value.trim();
+        const pass = $('login-pass').value.trim();
+        $('auth-msg-login').textContent = 'Accediendo…';
+        try {
+          await firebase.auth().signInWithEmailAndPassword(email, pass);
+          $('auth-msg-login').textContent = 'Listo. Cargando formulario…';
+        } catch (e) {
+          $('auth-msg-login').textContent = 'Error: ' + (e.message || e);
+        }
+      });
+
+      $('btn-reset')?.addEventListener('click', async () => {
+        const email = $('login-email').value.trim();
+        if (!email) return $('auth-msg-login').textContent = 'Escribe tu correo primero.';
+        try {
+          await firebase.auth().sendPasswordResetEmail(email);
+          $('auth-msg-login').textContent = 'Te enviamos un correo para restablecer.';
+        } catch (e) {
+          $('auth-msg-login').textContent = 'Error: ' + (e.message || e);
+        }
+      });
+
+      $('btn-register')?.addEventListener('click', async () => {
+        const email = $('reg-email').value.trim();
+        const pass = $('reg-pass').value.trim();
+        $('auth-msg-register').textContent = 'Creando cuenta…';
+        try {
+          const cred = await firebase.auth().createUserWithEmailAndPassword(email, pass);
+          try { await cred.user.sendEmailVerification(); } catch {}
+          $('auth-msg-register').textContent = 'Cuenta creada. Revisa tu correo para verificar.';
+        } catch (e) {
+          $('auth-msg-register').textContent = 'Error: ' + (e.message || e);
+        }
+      });
+
+      $('btn-logout')?.addEventListener('click', async () => {
+        try { await firebase.auth().signOut(); } catch {}
+      });
+    });
   </script>
 
   <!-- Analytics (GA4) -->
   <script src="/js/analytics.js" data-ga-id="G-RY7GC75EPC"></script>
 </body>
 </html>
+
