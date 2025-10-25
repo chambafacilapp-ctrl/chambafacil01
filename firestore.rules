@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function authed() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return authed() && request.auth.uid == uid;
+    }
+
+    function isPaid(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.paid == true;
+    }
+
+    function validStr(field, maxLen) {
+      return field is string && field.size() > 0 && field.size() <= maxLen;
+    }
+
+    function validStrOpt(fieldName, maxLen) {
+      return !(fieldName in request.resource.data) ||
+             (request.resource.data[fieldName] is string && request.resource.data[fieldName].size() <= maxLen);
+    }
+
+    function validPhone(phone) {
+      return phone is string &&
+             phone.size() >= 7 && phone.size() <= 15 &&
+             phone.matches('^\\d{7,15}$');
+    }
+
+    function validLocation(loc) {
+      return loc is map &&
+             loc.lat is number && loc.lng is number &&
+             loc.lat >= -90 && loc.lat <= 90 &&
+             loc.lng >= -180 && loc.lng <= 180;
+    }
+
+    function validPhotos(fieldName) {
+      return !(fieldName in request.resource.data) ||
+             (request.resource.data[fieldName] is list &&
+              request.resource.data[fieldName].size() <= 3 &&
+              request.resource.data[fieldName].every(photo => photo is string && photo.size() > 0 && photo.size() <= 200));
+    }
+
+    function profileAllowedKeys() {
+      return request.resource.data.keys().hasOnly([
+        'ownerUid', 'name', 'oficio', 'ciudad', 'descripcion',
+        'phone', 'photos', 'location', 'createdAt', 'updatedAt', 'public'
+      ]);
+    }
+
+    function oficioValido(oficio) {
+      return oficio in [
+        'Albañilería','Jardinería','Plomería','Electricidad',
+        'Mecánicos','Estilistas','Cerrajeros','Zapateros'
+      ];
+    }
+
+    function validProfile(uid) {
+      return
+        request.resource.data.ownerUid == uid &&
+        validStr(request.resource.data.name, 80) &&
+        validStr(request.resource.data.ciudad, 80) &&
+        request.resource.data.oficio is string &&
+        oficioValido(request.resource.data.oficio) &&
+        validStrOpt('descripcion', 600) &&
+        validPhone(request.resource.data.phone) &&
+        validPhotos('photos') &&
+        request.resource.data.location != null &&
+        validLocation(request.resource.data.location) &&
+        request.resource.data.public is bool &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp &&
+        (resource == null ? request.resource.data.updatedAt == request.resource.data.createdAt : true);
+    }
+
+    match /profiles/{uid} {
+      allow get, list: if true;
+
+      allow create: if isOwner(uid) && isPaid(uid) && profileAllowedKeys() && validProfile(uid);
+
+      allow update: if isOwner(uid) && isPaid(uid) &&
+                    request.resource.data.ownerUid == resource.data.ownerUid &&
+                    profileAllowedKeys() && validProfile(uid);
+
+      allow delete: if isOwner(uid);
+    }
+
+    match /users/{uid} {
+      allow get: if isOwner(uid);
+
+      allow create: if isOwner(uid) &&
+                    request.resource.data.keys().hasOnly(['email','createdAt','paid']) &&
+                    request.resource.data.email is string &&
+                    request.resource.data.createdAt is timestamp &&
+                    request.resource.data.paid == false;
+
+      allow update: if isOwner(uid) &&
+                    request.resource.data.email == resource.data.email &&
+                    (request.resource.data.paid == resource.data.paid);
+
+      allow delete: if false;
+    }
+
+    match /payments/{docId} {
+      allow get: if authed();
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+  }
+}
