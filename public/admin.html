@@ -1,71 +1,76 @@
 <!doctype html>
 <html lang="es" class="scroll-smooth">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chamba Fácil — Admin (crear perfil)</title>
-<meta name="description" content="Crea y edita tu perfil para aparecer en el mapa de Chamba Fácil.">
-<link rel="icon" type="image/png" href="/favicon-32.png">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={theme:{extend:{colors:{primary:{500:'#f97316',600:'#ea580c',700:'#c2410c'}}}}}</script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<style>:focus-visible{outline:3px solid #ea580c;outline-offset:2px}.field-error{border-color:#ef4444!important}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chamba Fácil — Admin (crear perfil)</title>
+  <meta name="description" content="Crea y edita tu perfil para aparecer en el mapa de Chamba Fácil.">
+  <link rel="icon" type="image/png" href="/favicon-32.png">
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RY7GC75EPC"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RY7GC75EPC');</script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#f97316',600:'#ea580c',700:'#c2410c'}}}}}</script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <style>:focus-visible{outline:3px solid #ea580c;outline-offset:2px}.field-error{border-color:#ef4444!important}</style>
 </head>
 <body class="bg-slate-50 text-slate-800">
-<script>(function(){const paid=localStorage.getItem('cf_paid_annual')==='true';if(!paid)location.href='/pago-previo.html';})();</script>
-<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b" role="banner">
-  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-    <a href="/" class="font-semibold flex items-center gap-2" aria-label="Volver al inicio"><span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white">CF</span> Chamba Fácil — Admin</a>
-    <nav class="text-sm" aria-label="Navegación"><a href="/" class="hover:text-primary-600">Inicio</a></nav>
-  </div>
-</header>
-<main class="container mx-auto px-4 py-6" role="main">
-  <div class="grid lg:grid-cols-3 gap-6">
-    <section class="lg:col-span-2 bg-white border rounded-2xl p-4">
-      <h1 class="text-2xl font-bold">Crear mi perfil</h1>
-      <p class="text-slate-600 mb-4">Completa tu información. Más adelante conectaremos directamente con Firestore y Mercado Pago.</p>
-      <div id="form-alert" class="hidden mb-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 px-3 py-2" role="alert" aria-live="polite"></div>
-      <form id="profile-form" class="grid md:grid-cols-2 gap-4" novalidate>
-        <div class="md:col-span-2"><label class="block text-sm font-medium" for="name">Nombre completo</label><input id="name" type="text" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="Ej: Juan Pérez" required aria-required="true"></div>
-        <div><label class="block text-sm font-medium" for="oficio">Especialidad</label><select id="oficio" class="mt-1 w-full rounded-xl border px-3 py-2" required aria-required="true"><option value="">Selecciona…</option><option>Albañilería</option><option>Jardinería</option><option>Plomería</option><option>Electricidad</option><option>Mecánicos</option><option>Estilistas</option><option>Cerrajeros</option><option>Zapateros</option></select></div>
-        <div><label class="block text-sm font-medium" for="ciudad">Ciudad</label><input id="ciudad" type="text" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="Ej: Morelia, Mich." required aria-required="true"></div>
-        <div class="md:col-span-2"><label class="block text-sm font-medium" for="descripcion">Descripción</label><textarea id="descripcion" rows="3" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="Servicios que realizas, experiencia, etc."></textarea></div>
-        <div><label class="block text-sm font-medium" for="phone">Teléfono (WhatsApp)</label><input id="phone" type="tel" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="10 dígitos" required aria-required="true" inputmode="numeric" pattern="[0-9]{7,15}"></div>
-        <div class="md:col-span-2"><label class="block text-sm font-medium">Fotos (IDs de Cloudinary) — opcional</label><div class="grid md:grid-cols-3 gap-2 mt-1"><input id="photo1" class="rounded-xl border px-3 py-2" placeholder="ej: sample" aria-label="Foto 1 (ID de Cloudinary)"><input id="photo2" class="rounded-xl border px-3 py-2" placeholder="ej: sample2" aria-label="Foto 2 (ID de Cloudinary)"><input id="photo3" class="rounded-xl border px-3 py-2" placeholder="ej: sample3" aria-label="Foto 3 (ID de Cloudinary)"></div><p class="text-xs text-slate-500 mt-1">Usaremos Cloudinary por ID (public_id). Más tarde habilitaremos carga directa.</p></div>
-        <div class="md:col-span-2 bg-slate-50 border rounded-xl p-3">
-          <div class="flex items-center justify-between mb-2"><div><h2 class="font-semibold">Ubicación</h2><p class="text-sm text-slate-600">Coloca tu punto para aparecer en el mapa.</p></div><button id="btn-geo" type="button" class="rounded-xl border px-3 py-2">📍 Usar mi ubicación</button></div>
-          <div class="grid md:grid-cols-3 gap-3">
-            <label class="text-sm" for="lat">Lat<input id="lat" type="number" step="any" class="w-full rounded-xl border px-3 py-2 mt-1" placeholder="19.7008"></label>
-            <label class="text-sm" for="lng">Lng<input id="lng" type="number" step="any" class="w-full rounded-xl border px-3 py-2 mt-1" placeholder="-101.1844"></label>
-            <button id="btn-preview" type="button" class="rounded-xl bg-primary-600 text-white px-3 py-2 mt-6">Vista previa en mapa</button>
+  <script>(function(){const paid=localStorage.getItem('cf_paid_annual')==='true';if(!paid)location.href='/pago-previo.html';})();</script>
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b" role="banner">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="font-semibold flex items-center gap-2" aria-label="Volver al inicio"><span aria-hidden="true" class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white">CF</span> Chamba Fácil — Admin</a>
+      <nav class="text-sm" aria-label="Navegación"><a href="/" class="hover:text-primary-600">Inicio</a></nav>
+    </div>
+  </header>
+  <main class="container mx-auto px-4 py-6" role="main">
+    <div class="grid lg:grid-cols-3 gap-6">
+      <section class="lg:col-span-2 bg-white border rounded-2xl p-4">
+        <h1 class="text-2xl font-bold">Crear mi perfil</h1>
+        <p class="text-slate-600 mb-4">Completa tu información. Más adelante conectaremos directamente con Firestore y Mercado Pago.</p>
+        <div id="form-alert" class="hidden mb-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 px-3 py-2" role="alert" aria-live="polite"></div>
+        <form id="profile-form" class="grid md:grid-cols-2 gap-4" novalidate>
+          <div class="md:col-span-2"><label class="block text-sm font-medium" for="name">Nombre completo</label><input id="name" type="text" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="Ej: Juan Pérez" required aria-required="true"></div>
+          <div><label class="block text-sm font-medium" for="oficio">Especialidad</label><select id="oficio" class="mt-1 w-full rounded-xl border px-3 py-2" required aria-required="true"><option value="">Selecciona…</option><option>Albañilería</option><option>Jardinería</option><option>Plomería</option><option>Electricidad</option><option>Mecánicos</option><option>Estilistas</option><option>Cerrajeros</option><option>Zapateros</option></select></div>
+          <div><label class="block text-sm font-medium" for="ciudad">Ciudad</label><input id="ciudad" type="text" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="Ej: Morelia, Mich." required aria-required="true"></div>
+          <div class="md:col-span-2"><label class="block text-sm font-medium" for="descripcion">Descripción</label><textarea id="descripcion" rows="3" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="Servicios que realizas, experiencia, etc."></textarea></div>
+          <div><label class="block text-sm font-medium" for="phone">Teléfono (WhatsApp)</label><input id="phone" type="tel" class="mt-1 w-full rounded-xl border px-3 py-2" placeholder="10 dígitos" required aria-required="true" inputmode="numeric" pattern="[0-9]{7,15}"></div>
+          <div class="md:col-span-2"><label class="block text-sm font-medium">Fotos (IDs de Cloudinary) — opcional</label><div class="grid md:grid-cols-3 gap-2 mt-1"><input id="photo1" class="rounded-xl border px-3 py-2" placeholder="ej: sample" aria-label="Foto 1 (ID de Cloudinary)"><input id="photo2" class="rounded-xl border px-3 py-2" placeholder="ej: sample2" aria-label="Foto 2 (ID de Cloudinary)"><input id="photo3" class="rounded-xl border px-3 py-2" placeholder="ej: sample3" aria-label="Foto 3 (ID de Cloudinary)"></div><p class="text-xs text-slate-500 mt-1">Usaremos Cloudinary por ID (public_id). Más tarde habilitaremos carga directa.</p></div>
+          <div class="md:col-span-2 bg-slate-50 border rounded-xl p-3">
+            <div class="flex items-center justify-between mb-2"><div><h2 class="font-semibold">Ubicación</h2><p class="text-sm text-slate-600">Coloca tu punto para aparecer en el mapa.</p></div><button id="btn-geo" type="button" class="rounded-xl border px-3 py-2">📍 Usar mi ubicación</button></div>
+            <div class="grid md:grid-cols-3 gap-3">
+              <label class="text-sm" for="lat">Lat<input id="lat" type="number" step="any" class="w-full rounded-xl border px-3 py-2 mt-1" placeholder="19.7008"></label>
+              <label class="text-sm" for="lng">Lng<input id="lng" type="number" step="any" class="w-full rounded-xl border px-3 py-2 mt-1" placeholder="-101.1844"></label>
+              <button id="btn-preview" type="button" class="rounded-xl bg-primary-600 text-white px-3 py-2 mt-6">Vista previa en mapa</button>
+            </div>
+            <div id="map" class="h-64 w-full rounded-xl border mt-3" role="region" aria-label="Mapa para vista previa de ubicación"></div>
           </div>
-          <div id="map" class="h-64 w-full rounded-xl border mt-3" role="region" aria-label="Mapa para vista previa de ubicación"></div>
-        </div>
-        <div class="md:col-span-2 flex gap-3"><button id="btn-save-local" type="button" class="rounded-xl bg-primary-600 text-white px-4 py-2">Guardar local (pruebas)</button><button id="btn-export-json" type="button" class="rounded-xl border px-4 py-2">Exportar JSON</button></div>
-      </form>
-    </section>
-    <aside class="bg-white border rounded-2xl p-4">
-      <h2 class="text-lg font-semibold mb-2">Estado</h2>
-      <ul class="text-sm text-slate-600 space-y-1"><li>✔ Acceso permitido (pago marcado en este dispositivo)</li><li>⚠ Aún sin sincronización en la nube (Firestore)</li><li>📸 Cloudinary pronto con subida directa</li></ul>
-      <hr class="my-4"><h3 class="font-semibold mb-2">Ayuda rápida</h3>
-      <p class="text-sm">Si cambias de dispositivo, vuelve a <a class="text-primary-600 hover:underline" href="/pago-previo.html">marcar pago</a> para entrar.</p>
-      <div id="saved-count" class="text-xs text-slate-500 mt-2"></div>
-    </aside>
-  </div>
-</main>
-<script>
-let map,marker;function ensureMap(){if(map)return;map=L.map('map').setView([19.7008,-101.1844],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);}
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){ensureMap();obs.disconnect();}})},{rootMargin:'100px'});obs.observe(document.getElementById('map'));
-function updateMarker(lat,lng){ensureMap();if(marker){map.removeLayer(marker);}marker=L.marker([lat,lng]).addTo(map).bindPopup('Tu ubicación');map.setView([lat,lng],14);}
-document.getElementById('btn-geo').addEventListener('click',()=>{if(!navigator.geolocation)return alert('Geolocalización no disponible');navigator.geolocation.getCurrentPosition(p=>{const lat=p.coords.latitude,lng=p.coords.longitude;document.getElementById('lat').value=lat.toFixed(6);document.getElementById('lng').value=lng.toFixed(6);updateMarker(lat,lng);},()=>alert('Activa tu ubicación e inténtalo de nuevo'),{enableHighAccuracy:true,timeout:10000});});
-document.getElementById('btn-preview').addEventListener('click',()=>{const lat=parseFloat(document.getElementById('lat').value);const lng=parseFloat(document.getElementById('lng').value);if(Number.isFinite(lat)&&Number.isFinite(lng))updateMarker(lat,lng);else showError('Lat/Lng inválidos. Completa ambos campos con números válidos.');});
-document.getElementById('btn-save-local').addEventListener('click',()=>{const data=readForm();if(!data)return;const drafts=JSON.parse(localStorage.getItem('cf_admin_drafts')||'[]');drafts.push(data);localStorage.setItem('cf_admin_drafts',JSON.stringify(drafts));showInfo('Borrador guardado localmente (no subido a la nube).');updateSavedCount();});
-document.getElementById('btn-export-json').addEventListener('click',()=>{const data=readForm();if(!data)return;const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='perfil_chambafacil.json';a.click();URL.revokeObjectURL(a.href);});
-function showError(msg){const a=document.getElementById('form-alert');a.textContent=msg;a.classList.remove('hidden');a.classList.remove('border-amber-300','bg-amber-50','text-amber-800');a.classList.add('border-red-300','bg-red-50','text-red-800');}
-function showInfo(msg){const a=document.getElementById('form-alert');a.textContent=msg;a.classList.remove('hidden');a.classList.remove('border-red-300','bg-red-50','text-red-800');a.classList.add('border-amber-300','bg-amber-50','text-amber-800');}
-function markInvalid(el,invalid){el.classList.toggle('field-error',!!invalid);el.setAttribute('aria-invalid',invalid?'true':'false');}
-function readForm(){const nameEl=document.getElementById('name');const oficioEl=document.getElementById('oficio');const ciudadEl=document.getElementById('ciudad');const descEl=document.getElementById('descripcion');const phoneEl=document.getElementById('phone');const photo1=document.getElementById('photo1').value.trim();const photo2=document.getElementById('photo2').value.trim();const photo3=document.getElementById('photo3').value.trim();const latEl=document.getElementById('lat');const lngEl=document.getElementById('lng');let ok=true;markInvalid(nameEl,!nameEl.value.trim());ok=ok&&!!nameEl.value.trim();markInvalid(oficioEl,!oficioEl.value);ok=ok&&!!oficioEl.value;markInvalid(ciudadEl,!ciudadEl.value.trim());ok=ok&&!!ciudadEl.value.trim();const phone=(phoneEl.value||'').replace(/\D+/g,'');markInvalid(phoneEl,!/^[0-9]{7,15}$/.test(phone));ok=ok&&/^[0-9]{7,15}$/.test(phone);const lat=parseFloat(latEl.value);const lng=parseFloat(lngEl.value);markInvalid(latEl,!Number.isFinite(lat));ok=ok&&Number.isFinite(lat);markInvalid(lngEl,!Number.isFinite(lng));ok=ok&&Number.isFinite(lng);if(!ok){showError('Revisa los campos marcados en rojo.');return null;}const photos=[photo1,photo2,photo3].filter(Boolean);return {ownerUid:'local-user',name:nameEl.value.trim(),oficio:oficioEl.value,ciudad:ciudadEl.value.trim(),descripcion:descEl.value.trim(),phone,photos,location:{lat,lng},public:true,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};}
-function updateSavedCount(){const drafts=JSON.parse(localStorage.getItem('cf_admin_drafts')||'[]');const el=document.getElementById('saved-count');el.textContent=drafts.length?`Borradores locales: ${drafts.length}`:'Sin borradores locales';}
-updateSavedCount();
-</script>
-</body></html>
+          <div class="md:col-span-2 flex gap-3"><button id="btn-save-local" type="button" class="rounded-xl bg-primary-600 text-white px-4 py-2">Guardar local (pruebas)</button><button id="btn-export-json" type="button" class="rounded-xl border px-4 py-2">Exportar JSON</button></div>
+        </form>
+      </section>
+      <aside class="bg-white border rounded-2xl p-4">
+        <h2 class="text-lg font-semibold mb-2">Estado</h2>
+        <ul class="text-sm text-slate-600 space-y-1"><li>✔ Acceso permitido (pago marcado en este dispositivo)</li><li>⚠ Aún sin sincronización en la nube (Firestore)</li><li>📸 Cloudinary pronto con subida directa</li></ul>
+        <hr class="my-4"><h3 class="font-semibold mb-2">Ayuda rápida</h3>
+        <p class="text-sm">Si cambias de dispositivo, vuelve a <a class="text-primary-600 hover:underline" href="/pago-previo.html">marcar pago</a> para entrar.</p>
+        <div id="saved-count" class="text-xs text-slate-500 mt-2"></div>
+      </aside>
+    </div>
+  </main>
+  <script>
+    let map,marker;function ensureMap(){if(map)return;map=L.map('map').setView([19.7008,-101.1844],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);}
+    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){ensureMap();obs.disconnect();}})},{rootMargin:'100px'});obs.observe(document.getElementById('map'));
+    function updateMarker(lat,lng){ensureMap();if(marker){map.removeLayer(marker);}marker=L.marker([lat,lng]).addTo(map).bindPopup('Tu ubicación');map.setView([lat,lng],14);}
+    document.getElementById('btn-geo').addEventListener('click',()=>{if(!navigator.geolocation)return alert('Geolocalización no disponible');navigator.geolocation.getCurrentPosition(p=>{const lat=p.coords.latitude,lng=p.coords.longitude;document.getElementById('lat').value=lat.toFixed(6);document.getElementById('lng').value=lng.toFixed(6);updateMarker(lat,lng);},()=>alert('Activa tu ubicación e inténtalo de nuevo'),{enableHighAccuracy:true,timeout:10000});});
+    document.getElementById('btn-preview').addEventListener('click',()=>{const lat=parseFloat(document.getElementById('lat').value);const lng=parseFloat(document.getElementById('lng').value);if(Number.isFinite(lat)&&Number.isFinite(lng))updateMarker(lat,lng);else showError('Lat/Lng inválidos. Completa ambos campos con números válidos.');});
+    document.getElementById('btn-save-local').addEventListener('click',()=>{const data=readForm();if(!data)return;const drafts=JSON.parse(localStorage.getItem('cf_admin_drafts')||'[]');drafts.push(data);localStorage.setItem('cf_admin_drafts',JSON.stringify(drafts));showInfo('Borrador guardado localmente (no subido a la nube).');updateSavedCount();});
+    document.getElementById('btn-export-json').addEventListener('click',()=>{const data=readForm();if(!data)return;const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='perfil_chambafacil.json';a.click();URL.revokeObjectURL(a.href);});
+    function showError(msg){const a=document.getElementById('form-alert');a.textContent=msg;a.classList.remove('hidden');a.classList.remove('border-amber-300','bg-amber-50','text-amber-800');a.classList.add('border-red-300','bg-red-50','text-red-800');}
+    function showInfo(msg){const a=document.getElementById('form-alert');a.textContent=msg;a.classList.remove('hidden');a.classList.remove('border-red-300','bg-red-50','text-red-800');a.classList.add('border-amber-300','bg-amber-50','text-amber-800');}
+    function markInvalid(el,invalid){el.classList.toggle('field-error',!!invalid);el.setAttribute('aria-invalid',invalid?'true':'false');}
+    function readForm(){const nameEl=document.getElementById('name');const oficioEl=document.getElementById('oficio');const ciudadEl=document.getElementById('ciudad');const descEl=document.getElementById('descripcion');const phoneEl=document.getElementById('phone');const photo1=document.getElementById('photo1').value.trim();const photo2=document.getElementById('photo2').value.trim();const photo3=document.getElementById('photo3').value.trim();const latEl=document.getElementById('lat');const lngEl=document.getElementById('lng');let ok=true;markInvalid(nameEl,!nameEl.value.trim());ok=ok&&!!nameEl.value.trim();markInvalid(oficioEl,!oficioEl.value);ok=ok&&!!oficioEl.value;markInvalid(ciudadEl,!ciudadEl.value.trim());ok=ok&&!!ciudadEl.value.trim();const phone=(phoneEl.value||'').replace(/\D+/g,'');markInvalid(phoneEl,!/^[0-9]{7,15}$/.test(phone));ok=ok&&/^[0-9]{7,15}$/.test(phone);const lat=parseFloat(latEl.value);const lng=parseFloat(lngEl.value);markInvalid(latEl,!Number.isFinite(lat));ok=ok&&Number.isFinite(lat);markInvalid(lngEl,!Number.isFinite(lng));ok=ok&&Number.isFinite(lng);if(!ok){showError('Revisa los campos marcados en rojo.');return null;}const photos=[photo1,photo2,photo3].filter(Boolean);return{ownerUid:'local-user',name:nameEl.value.trim(),oficio:oficioEl.value,ciudad:ciudadEl.value.trim(),descripcion:descEl.value.trim(),phone,photos,location:{lat,lng},public:true,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};}
+    function updateSavedCount(){const drafts=JSON.parse(localStorage.getItem('cf_admin_drafts')||'[]');const el=document.getElementById('saved-count');el.textContent=drafts.length?`Borradores locales: ${drafts.length}`:'Sin borradores locales';}
+    updateSavedCount();
+  </script>
+</body>
+</html>

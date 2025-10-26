@@ -6,23 +6,11 @@
   <title>Chamba Fácil — Activar suscripción anual</title>
   <meta name="description" content="Activa tu suscripción anual de Chamba Fácil para crear tu perfil y aparecer en el mapa.">
   <meta name="theme-color" content="#f97316">
-
-  <!-- GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RY7GC75EPC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-RY7GC75EPC');
-  </script>
-
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config','G-RY7GC75EPC');</script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { theme: { extend: { colors: { primary: {500:'#f97316',600:'#ea580c',700:'#c2410c'} } } } }
-  </script>
-  <style>
-    :focus-visible { outline: 3px solid #ea580c; outline-offset: 2px; }
-  </style>
+  <script>tailwind.config={theme:{extend:{colors:{primary:{500:'#f97316',600:'#ea580c',700:'#c2410c'}}}}}</script>
+  <style>:focus-visible{outline:3px solid #ea580c;outline-offset:2px}</style>
 </head>
 <body class="bg-slate-50 text-slate-800">
   <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
@@ -35,47 +23,35 @@
       </nav>
     </div>
   </header>
-
   <main class="container mx-auto px-4 py-8 max-w-3xl">
     <section class="bg-white border rounded-2xl p-6 shadow-sm">
       <h1 class="text-2xl md:text-3xl font-bold text-center">Activa tu suscripción anual</h1>
       <p class="text-center text-slate-600 mt-2">Para crear tu perfil y aparecer en el mapa.</p>
-
       <div class="mt-6 grid md:grid-cols-2 gap-4">
-        <!-- Tarifa -->
         <div class="rounded-xl border p-4">
           <h2 class="text-lg font-semibold">Tarifa única</h2>
           <p class="mt-1 text-sm text-slate-600">Inscripción anual</p>
-          <p class="text-4xl font-extrabold mt-2">$150 <span class="text-base font-normal text-slate-500">MXN / año</span></p>
+          <p class="text-4xl font-extrabold mt-2">$150 <span class="text-base text-slate-500">MXN / año</span></p>
           <ul class="mt-3 text-sm text-slate-700 list-disc ml-5 space-y-1">
             <li>Perfil por especialidad (8 categorías)</li>
             <li>Apareces en el mapa “cerca de mí”</li>
             <li>Contacto directo por WhatsApp</li>
           </ul>
         </div>
-
-        <!-- Formas de pago (texto explicativo) -->
         <div class="rounded-xl border p-4">
           <h2 class="text-lg font-semibold">Formas de pago</h2>
           <ul class="mt-2 text-sm text-slate-700 space-y-2">
-            <li><strong>SPEI (transferencia):</strong> a <em>Banorte</em>, CLABE <code class="bg-slate-100 px-1 rounded">072215006149433481</code>, a nombre de <em>Eduardo Díaz Sánchez</em>. Concepto: <em>“Inscripción anual Chamba Fácil”</em>.</li>
-            <li><strong>OXXO:</strong> depósito en tienda (referencia por Mercado Pago, próximamente en el portal).</li>
+            <li><strong>SPEI (transferencia):</strong> Banorte, CLABE <code class="bg-slate-100 px-1 rounded">072215006149433481</code>, a nombre de <em>Eduardo Díaz Sánchez</em>. Concepto: <em>“Inscripción anual Chamba Fácil”</em>.</li>
+            <li><strong>OXXO:</strong> depósito en tienda (referencia por Mercado Pago, próximamente).</li>
           </ul>
           <p class="mt-3 text-xs text-slate-500">Tip: guarda tu comprobante para cualquier aclaración.</p>
-          <div class="mt-3">
-            <button type="button" class="rounded-lg border px-3 py-2 text-sm"
-              onclick="navigator.clipboard.writeText('072215006149433481')">Copiar CLABE</button>
-          </div>
+          <div class="mt-3"><button type="button" class="rounded-lg border px-3 py-2 text-sm" onclick="navigator.clipboard.writeText('072215006149433481')">Copiar CLABE</button></div>
         </div>
       </div>
-
-      <!-- Confirmación -->
       <div class="mt-6 rounded-xl border p-4 bg-slate-50">
         <label class="flex items-start gap-3">
           <input id="chk-paid" type="checkbox" class="mt-1 h-5 w-5 rounded border-gray-300">
-          <span class="text-slate-700">
-            Confirmo que ya realicé mi pago anual de <strong>$150 MXN</strong> por SPEI u OXXO y deseo continuar para crear mi perfil.
-          </span>
+          <span class="text-slate-700">Confirmo que ya realicé mi pago anual de <strong>$150 MXN</strong> por SPEI u OXXO y deseo continuar para crear mi perfil.</span>
         </label>
         <div class="mt-4 grid sm:grid-cols-2 gap-3">
           <a href="/#pagos" class="rounded-xl border px-4 py-3 text-center">Ver instrucciones de pago</a>
@@ -83,29 +59,16 @@
         </div>
         <p class="text-xs text-slate-500 mt-3 text-center">Podrás subir fotos, ubicación y datos de contacto en el siguiente paso.</p>
       </div>
-
       <p class="text-xs text-slate-500 mt-6 text-center">Al continuar aceptas nuestros <a href="/terminos.html" class="text-primary-600 hover:underline">Términos</a> y <a href="/politica.html" class="text-primary-600 hover:underline">Aviso de privacidad</a>.</p>
     </section>
   </main>
-
-  <footer class="py-10 text-center text-sm text-slate-500">
-    © <span id="year"></span> Chamba Fácil
-  </footer>
-
+  <footer class="py-10 text-center text-sm text-slate-500">© <span id="year"></span> Chamba Fácil</footer>
   <script>
-    const chk = document.getElementById('chk-paid');
-    const btn = document.getElementById('btn-continue');
-    function updateContinue(){
-      const paid = localStorage.getItem('cf_paid_annual') === 'true';
-      btn.disabled = !(paid || chk.checked);
-    }
-    chk.addEventListener('change', updateContinue);
-    updateContinue();
-    btn.addEventListener('click', () => {
-      if (chk.checked) localStorage.setItem('cf_paid_annual','true');
-      location.href = '/admin.html';
-    });
-    document.getElementById('year').textContent = new Date().getFullYear();
+    const chk=document.getElementById('chk-paid');const btn=document.getElementById('btn-continue');
+    function updateContinue(){const paid=localStorage.getItem('cf_paid_annual')==='true';btn.disabled=!(paid||chk.checked);}
+    chk.addEventListener('change',updateContinue);updateContinue();
+    btn.addEventListener('click',()=>{if(chk.checked) localStorage.setItem('cf_paid_annual','true'); location.href='/admin.html';});
+    document.getElementById('year').textContent=new Date().getFullYear();
   </script>
 </body>
 </html>
